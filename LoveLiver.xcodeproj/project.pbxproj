@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		133DFE291BC8B71100902407 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE281BC8B71100902407 /* main.swift */; };
+		133DFE371BC8C3E000902407 /* CommandLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE331BC8C3E000902407 /* CommandLine.swift */; settings = {ASSET_TAGS = (); }; };
+		133DFE381BC8C3E000902407 /* Option.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE351BC8C3E000902407 /* Option.swift */; settings = {ASSET_TAGS = (); }; };
+		133DFE391BC8C3E000902407 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE361BC8C3E000902407 /* StringExtensions.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +28,10 @@
 /* Begin PBXFileReference section */
 		133DFE251BC8B71100902407 /* LoveLiver */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoveLiver; sourceTree = BUILT_PRODUCTS_DIR; };
 		133DFE281BC8B71100902407 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		133DFE331BC8C3E000902407 /* CommandLine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommandLine.swift; sourceTree = "<group>"; };
+		133DFE341BC8C3E000902407 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		133DFE351BC8C3E000902407 /* Option.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Option.swift; sourceTree = "<group>"; };
+		133DFE361BC8C3E000902407 /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,9 +64,21 @@
 		133DFE271BC8B71100902407 /* LoveLiver */ = {
 			isa = PBXGroup;
 			children = (
+				133DFE321BC8C3E000902407 /* CommandLine */,
 				133DFE281BC8B71100902407 /* main.swift */,
 			);
 			path = LoveLiver;
+			sourceTree = "<group>";
+		};
+		133DFE321BC8C3E000902407 /* CommandLine */ = {
+			isa = PBXGroup;
+			children = (
+				133DFE331BC8C3E000902407 /* CommandLine.swift */,
+				133DFE341BC8C3E000902407 /* Info.plist */,
+				133DFE351BC8C3E000902407 /* Option.swift */,
+				133DFE361BC8C3E000902407 /* StringExtensions.swift */,
+			);
+			path = CommandLine;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -118,7 +137,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				133DFE391BC8C3E000902407 /* StringExtensions.swift in Sources */,
 				133DFE291BC8B71100902407 /* main.swift in Sources */,
+				133DFE381BC8C3E000902407 /* Option.swift in Sources */,
+				133DFE371BC8C3E000902407 /* CommandLine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,6 +258,7 @@
 				133DFE2E1BC8B71100902407 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
