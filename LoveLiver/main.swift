@@ -21,7 +21,7 @@ let image = StringOption(shortFlag: "i", longFlag: "jpeg", required: false,
     helpMessage: "Path to the image file.")
 let mov = StringOption(shortFlag: "m", longFlag: "mov", required: false,
     helpMessage: "Path to the mov file.")
-let output = StringOption(shortFlag: "o", longFlag: "output", required: false,
+let output = StringOption(shortFlag: "d", longFlag: "output", required: false,
     helpMessage: "Path to the output live photo.")
 
 cli.setOptions(op, image, mov, output)
@@ -50,5 +50,22 @@ case Operation.DumpMOVMetaData:
         print("Please specify --mov option.")
     }
 case Operation.CreateLivePhoto:
-    print("generate livephoto")
+    if let image = image.value {
+        if let mov = mov.value {
+            if let output = output.value {
+                let assetIdentifier = NSUUID().UUIDString
+                let _ = try? NSFileManager.defaultManager().createDirectoryAtPath(output, withIntermediateDirectories: true, attributes: nil)
+                JPEG(path: image).write(output.stringByAppendingString("/IMG.JPG"),
+                    assetIdentifier: assetIdentifier)
+                QuickTimeMov(path: mov).write(output.stringByAppendingString("/IMG.MOV"),
+                    assetIdentifier: assetIdentifier)
+            } else {
+                print("Please specify --output option.")
+            }
+        } else {
+            print("Please specify --mov option.")
+        }
+    } else {
+        print("Please specify --jpeg option.")
+    }
 }
