@@ -11,6 +11,8 @@
 		133DFE371BC8C3E000902407 /* CommandLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE331BC8C3E000902407 /* CommandLine.swift */; settings = {ASSET_TAGS = (); }; };
 		133DFE381BC8C3E000902407 /* Option.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE351BC8C3E000902407 /* Option.swift */; settings = {ASSET_TAGS = (); }; };
 		133DFE391BC8C3E000902407 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE361BC8C3E000902407 /* StringExtensions.swift */; settings = {ASSET_TAGS = (); }; };
+		133DFE3B1BC8C69900902407 /* JPEG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3A1BC8C69900902407 /* JPEG.swift */; settings = {ASSET_TAGS = (); }; };
+		133DFE3D1BC8C6EF00902407 /* QuickTimeMov.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,6 +34,8 @@
 		133DFE341BC8C3E000902407 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		133DFE351BC8C3E000902407 /* Option.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Option.swift; sourceTree = "<group>"; };
 		133DFE361BC8C3E000902407 /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		133DFE3A1BC8C69900902407 /* JPEG.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JPEG.swift; sourceTree = "<group>"; };
+		133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickTimeMov.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +70,8 @@
 			children = (
 				133DFE321BC8C3E000902407 /* CommandLine */,
 				133DFE281BC8B71100902407 /* main.swift */,
+				133DFE3A1BC8C69900902407 /* JPEG.swift */,
+				133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */,
 			);
 			path = LoveLiver;
 			sourceTree = "<group>";
@@ -138,9 +144,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				133DFE391BC8C3E000902407 /* StringExtensions.swift in Sources */,
+				133DFE3B1BC8C69900902407 /* JPEG.swift in Sources */,
 				133DFE291BC8B71100902407 /* main.swift in Sources */,
 				133DFE381BC8C3E000902407 /* Option.swift in Sources */,
 				133DFE371BC8C3E000902407 /* CommandLine.swift in Sources */,
+				133DFE3D1BC8C6EF00902407 /* QuickTimeMov.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
