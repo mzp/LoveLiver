@@ -33,9 +33,14 @@ do {
     exit(EX_USAGE)
 }
 
+let kErrorMessage = "no metadata"
 switch op.value! {
 case Operation.DumpJPEGMetaData:
-    print("dump jpeg metadata")
+    if let path = image.value {
+        print("asset identifier: \(JPEG(path: path).read() ?? kErrorMessage)")
+    } else {
+        print("Please specify --jpeg option.")
+    }
 case Operation.DumpMOVMetaData:
     print("dump mov metadata")
 case Operation.CreateLivePhoto:
