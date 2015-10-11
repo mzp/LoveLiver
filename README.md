@@ -10,9 +10,9 @@ LoveLiver is a CLI tool to create Apple's Live Photos from JPEG and MOV.
  * Photos.app
 
 ## Install
- 
- 1. Go to the releases page, find the version you want.
- 2. Download the file. 
+
+ 1. Go to the [releases page](https://github.com/mzp/LoveLiver/releases), find the version you want.
+ 2. Download the file.
  3. Put the binary to somewhere you want (e.g. `/usr/local/bin`).
  4. Make sure it has execution bits turned on by `chmod a+x LoveLiver`.
 
