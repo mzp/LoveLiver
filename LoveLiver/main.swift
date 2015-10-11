@@ -42,7 +42,13 @@ case Operation.DumpJPEGMetaData:
         print("Please specify --jpeg option.")
     }
 case Operation.DumpMOVMetaData:
-    print("dump mov metadata")
+    if let path = mov.value {
+        let qt = QuickTimeMov(path: path)
+        print("asset identifier: \(qt.readAssetIdentifier() ?? kErrorMessage)")
+        print("still image time: \(qt.readStillImageTime() ?? kErrorMessage)")
+    } else {
+        print("Please specify --mov option.")
+    }
 case Operation.CreateLivePhoto:
     print("generate livephoto")
 }
