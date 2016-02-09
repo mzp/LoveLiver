@@ -32,6 +32,13 @@ class MovieDocumentViewController: NSViewController {
         b.target = self
         b.action = "capturePosterFrame:"
     }
+    private lazy var createLivePhotoButton: NSButton = NSButton() ※ { b in
+        b.title = "Create Live Photo"
+        b.setButtonType(.MomentaryLightButton)
+        b.bezelStyle = .RoundedBezelStyle
+        b.target = self
+        b.action = "createLivePhoto:"
+    }
 
     init!(movieURL: NSURL) {
         super.init(nibName: nil, bundle: nil)
@@ -49,12 +56,14 @@ class MovieDocumentViewController: NSViewController {
             "player": playerView,
             "posterButton": posterFrameButton,
             "posterView": posterFrameView,
+            "createLivePhoto": createLivePhotoButton,
             ])
         autolayout("H:|-p-[player]-p-[posterView(==player)]-p-|")
-        autolayout("H:|-p-[posterButton(==player)]")
+        autolayout("H:|-p-[posterButton(==player)]-p-[createLivePhoto(<=player)]-p-|")
         autolayout("V:|-p-[player]-p-[posterButton]")
         autolayout("V:|-p-[posterView]-p-[posterButton]")
         autolayout("V:[posterButton]-p-|")
+        autolayout("V:[createLivePhoto]-p-|")
 
         setupAspectRatioConstraints()
     }
@@ -81,5 +90,49 @@ class MovieDocumentViewController: NSViewController {
         guard let cgImage = try? generator.copyCGImageAtTime(player.currentTime(), actualTime: nil) else { return }
         let image = NSImage(CGImage: cgImage, size: CGSize(width: CGImageGetWidth(cgImage), height: CGImageGetHeight(cgImage)))
         posterFrameView.image = image
+    }
+
+    @objc private func createLivePhoto(sender: AnyObject?) {
+        guard let player = playerView.player else { return }
+        guard let asset = player.currentItem?.asset else { return }
+        guard let image = posterFrameView.image else { return }
+
+        let outputDir = NSURL(fileURLWithPath: NSHomeDirectory()).URLByAppendingPathComponent("Pictures/LoveLiver")
+        guard let _ = try? NSFileManager.defaultManager().createDirectoryAtPath(outputDir.path!, withIntermediateDirectories: true, attributes: nil) else { return }
+
+        let assetIdentifier = NSUUID().UUIDString
+        let tmpImagePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(assetIdentifier).tiff").path!
+        let tmpMoviePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(assetIdentifier).mov").path!
+        let imagePath = outputDir.URLByAppendingPathComponent("\(assetIdentifier).JPG").path!
+        let moviePath = outputDir.URLByAppendingPathComponent("\(assetIdentifier).MOV").path!
+        let paths = [tmpImagePath, tmpMoviePath, imagePath, moviePath]
+
+        for path in paths {
+            guard !NSFileManager.defaultManager().fileExistsAtPath(path) else { return }
+        }
+
+        guard image.TIFFRepresentation?.writeToFile(tmpImagePath, atomically: true) == true else { return }
+        guard let session = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetPassthrough) else { return }
+        session.outputFileType = "com.apple.quicktime-movie"
+        session.outputURL = NSURL(fileURLWithPath: tmpMoviePath)
+        session.timeRange = CMTimeRange(start: player.currentTime(), duration: CMTime(value: 3*600, timescale: 600))
+        session.exportAsynchronouslyWithCompletionHandler {
+            dispatch_async(dispatch_get_main_queue()) {
+                switch session.status {
+                case .Completed:
+                    NSLog("%@", "exportAsynchronouslyWithCompletionHandler = \(session.status)")
+
+                    JPEG(path: tmpImagePath).write(imagePath, assetIdentifier: assetIdentifier)
+                    NSLog("%@", "LivePhoto JPEG created: \(imagePath)")
+                    NSWorkspace.sharedWorkspace().selectFile(imagePath, inFileViewerRootedAtPath: "")
+
+                    QuickTimeMov(path: tmpMoviePath).write(moviePath, assetIdentifier: assetIdentifier)
+                    NSLog("%@", "LivePhoto MOV created: \(moviePath)")
+                    NSWorkspace.sharedWorkspace().selectFile(moviePath, inFileViewerRootedAtPath: "")
+                case .Cancelled, .Exporting, .Failed, .Unknown, .Waiting:
+                    NSLog("%@", "exportAsynchronouslyWithCompletionHandler = \(session.status)")
+                }
+            }
+        }
     }
 }
