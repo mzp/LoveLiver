@@ -17,6 +17,8 @@
 		EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379AB81C68DE6D00106AEF /* AppDelegate.swift */; };
 		EA379ABB1C68DE6D00106AEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EA379ABA1C68DE6D00106AEF /* Assets.xcassets */; };
 		EA379ABE1C68DE6D00106AEF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA379ABC1C68DE6D00106AEF /* MainMenu.xib */; };
+		EA379ADA1C6A283500106AEF /* MovieDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379AD81C6A283500106AEF /* MovieDocument.swift */; };
+		EA379ADD1C6A2E8800106AEF /* MovieDocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379ADC1C6A2E8800106AEF /* MovieDocumentViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -48,6 +50,8 @@
 		EA379ABA1C68DE6D00106AEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EA379ABD1C68DE6D00106AEF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		EA379ABF1C68DE6D00106AEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EA379AD81C6A283500106AEF /* MovieDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieDocument.swift; sourceTree = "<group>"; };
+		EA379ADC1C6A2E8800106AEF /* MovieDocumentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieDocumentViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +136,8 @@
 			isa = PBXGroup;
 			children = (
 				EA379AB81C68DE6D00106AEF /* AppDelegate.swift */,
+				EA379AD81C6A283500106AEF /* MovieDocument.swift */,
+				EA379ADC1C6A2E8800106AEF /* MovieDocumentViewController.swift */,
 				EA379ABA1C68DE6D00106AEF /* Assets.xcassets */,
 				EA379ABC1C68DE6D00106AEF /* MainMenu.xib */,
 				EA379ABF1C68DE6D00106AEF /* Info.plist */,
@@ -295,6 +301,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */,
+				EA379ADA1C6A283500106AEF /* MovieDocument.swift in Sources */,
+				EA379ADD1C6A2E8800106AEF /* MovieDocumentViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
