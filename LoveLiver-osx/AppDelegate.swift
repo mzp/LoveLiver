@@ -49,11 +49,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             autolayout("V:|-p-[player]-p-[posterButton]")
             autolayout("V:|-p-[posterView]-p-[posterButton]")
             autolayout("V:[posterButton]-p-|")
+
+            setupAspectRatioConstraints()
         }
     }
 
     func applicationWillTerminate(aNotification: NSNotification) {
         // Insert code here to tear down your application
+    }
+
+    private func setupAspectRatioConstraints() {
+        // wait until movie is loaded
+        guard playerView.videoBounds.width > 0 && playerView.videoBounds.height > 0 else {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+                self.setupAspectRatioConstraints()
+            }
+            return
+        }
+
+        self.playerView.addConstraint(NSLayoutConstraint(
+            item: self.playerView, attribute: .Width, relatedBy: .Equal,
+            toItem: self.playerView, attribute: .Height, multiplier: self.playerView.videoBounds.width / self.playerView.videoBounds.height, constant: 0))
     }
 
     @objc private func capturePosterFrame(sender: AnyObject?) {
