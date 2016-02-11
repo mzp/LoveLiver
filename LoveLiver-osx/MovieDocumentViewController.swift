@@ -13,6 +13,9 @@ import NorthLayout
 import Ikemen
 
 
+private let outputDir = NSURL(fileURLWithPath: NSHomeDirectory()).URLByAppendingPathComponent("Pictures/LoveLiver")
+
+
 class MovieDocumentViewController: NSViewController {
     private let player: AVPlayer
     private let playerItem: AVPlayerItem
@@ -101,7 +104,6 @@ class MovieDocumentViewController: NSViewController {
     @objc private func createLivePhoto(sender: AnyObject?) {
         guard let image = posterFrameView.image else { return }
 
-        let outputDir = NSURL(fileURLWithPath: NSHomeDirectory()).URLByAppendingPathComponent("Pictures/LoveLiver")
         guard let _ = try? NSFileManager.defaultManager().createDirectoryAtPath(outputDir.path!, withIntermediateDirectories: true, attributes: nil) else { return }
 
         let assetIdentifier = NSUUID().UUIDString
@@ -124,19 +126,35 @@ class MovieDocumentViewController: NSViewController {
             dispatch_async(dispatch_get_main_queue()) {
                 switch session.status {
                 case .Completed:
-                    NSLog("%@", "exportAsynchronouslyWithCompletionHandler = \(session.status)")
-
                     JPEG(path: tmpImagePath).write(imagePath, assetIdentifier: assetIdentifier)
                     NSLog("%@", "LivePhoto JPEG created: \(imagePath)")
-                    NSWorkspace.sharedWorkspace().selectFile(imagePath, inFileViewerRootedAtPath: "")
 
                     QuickTimeMov(path: tmpMoviePath).write(moviePath, assetIdentifier: assetIdentifier)
                     NSLog("%@", "LivePhoto MOV created: \(moviePath)")
-                    NSWorkspace.sharedWorkspace().selectFile(moviePath, inFileViewerRootedAtPath: "")
+
+                    self.showInFinderAndOpenInPhotos([imagePath, moviePath].map{NSURL(fileURLWithPath: $0)})
                 case .Cancelled, .Exporting, .Failed, .Unknown, .Waiting:
                     NSLog("%@", "exportAsynchronouslyWithCompletionHandler = \(session.status)")
                 }
+
+                for path in [tmpImagePath, tmpMoviePath] {
+                    let _ = try? NSFileManager.defaultManager().removeItemAtPath(path)
+                }
             }
+        }
+    }
+
+    private func showInFinderAndOpenInPhotos(fileURLs: [NSURL]) {
+        NSWorkspace.sharedWorkspace().activateFileViewerSelectingURLs(fileURLs)
+
+        // wait until Finder is active or timed out,
+        // to avoid openURLs overtaking Finder activation
+        dispatch_async(dispatch_get_global_queue(0, 0)) {
+            let start = NSDate()
+            while NSWorkspace.sharedWorkspace().frontmostApplication?.bundleIdentifier != "com.apple.finder" && NSDate().timeIntervalSinceDate(start) < 5 {
+                NSThread.sleepForTimeInterval(0.1)
+            }
+            NSWorkspace.sharedWorkspace().openURLs(fileURLs, withAppBundleIdentifier: "com.apple.Photos", options: [], additionalEventParamDescriptor: nil, launchIdentifiers: nil)
         }
     }
 }
