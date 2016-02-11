@@ -45,6 +45,7 @@ class MovieDocumentViewController: NSViewController {
         b.bezelStyle = .RoundedBezelStyle
         b.target = self
         b.action = "createLivePhoto:"
+        b.bind("enabled", toObject: self.posterFrameView, withKeyPath: "image", options: [NSValueTransformerNameBindingOption: NSIsNotNilTransformerName])
     }
 
     init!(movieURL: NSURL) {
