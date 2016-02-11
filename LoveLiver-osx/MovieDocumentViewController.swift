@@ -20,6 +20,12 @@ class MovieDocumentViewController: NSViewController {
     private let player: AVPlayer
     private let playerItem: AVPlayerItem
     private let imageGenerator: AVAssetImageGenerator
+    private var posterFrameTime: CMTime? {
+        didSet {
+            willChangeValueForKey("positionsLabelText")
+            didChangeValueForKey("positionsLabelText")
+        }
+    }
 
     private let playerView: AVPlayerView = AVPlayerView() ※ { v in
         v.controlsStyle = .Floating
@@ -39,6 +45,24 @@ class MovieDocumentViewController: NSViewController {
         b.target = self
         b.action = "capturePosterFrame:"
     }
+
+    private lazy var positionsLabel: NSTextField = NSTextField() ※ { tf in
+        tf.bezeled = false
+        tf.editable = false
+        tf.drawsBackground = false
+        tf.textColor = NSColor.grayColor()
+        tf.bind("stringValue", toObject: self, withKeyPath: "positionsLabelText", options: nil)
+    }
+    @objc private var positionsLabelText: String {
+        guard let time = posterFrameTime else { return "" }
+        let duration = CMTimeGetSeconds(time)
+        let minutes = Int(floor(duration / 60))
+        let seconds = Int(floor(duration - Double(minutes) * 60))
+        let milliseconds = Int((duration - floor(duration)) * 100)
+        let timeString = String(format: "%02d:%02d.%02d", minutes, seconds, milliseconds)
+        return "Poster Frame: \(timeString)"
+    }
+
     private lazy var createLivePhotoButton: NSButton = NSButton() ※ { b in
         b.title = "Create Live Photo"
         b.setButtonType(.MomentaryLightButton)
@@ -71,13 +95,15 @@ class MovieDocumentViewController: NSViewController {
             "posterButton": posterFrameButton,
             "posterView": posterFrameView,
             "createLivePhoto": createLivePhotoButton,
+            "positionsLabel": positionsLabel,
             ])
         autolayout("H:|-p-[player]-p-[posterView(==player)]-p-|")
         autolayout("H:|-p-[posterButton(==player)]-p-[createLivePhoto(<=player)]-p-|")
+        autolayout("H:[positionsLabel(==createLivePhoto)]-p-|")
         autolayout("V:|-p-[player]-p-[posterButton]")
         autolayout("V:|-p-[posterView]-p-[posterButton]")
         autolayout("V:[posterButton]-p-|")
-        autolayout("V:[createLivePhoto]-p-|")
+        autolayout("V:[posterView][positionsLabel][createLivePhoto]-p-|")
 
         setupAspectRatioConstraints()
     }
@@ -100,6 +126,7 @@ class MovieDocumentViewController: NSViewController {
         guard let cgImage = try? imageGenerator.copyCGImageAtTime(player.currentTime(), actualTime: nil) else { return }
         let image = NSImage(CGImage: cgImage, size: CGSize(width: CGImageGetWidth(cgImage), height: CGImageGetHeight(cgImage)))
         posterFrameView.image = image
+        posterFrameTime = player.currentTime()
     }
 
     @objc private func createLivePhoto(sender: AnyObject?) {
