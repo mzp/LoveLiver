@@ -20,12 +20,8 @@ class MovieDocumentViewController: NSViewController {
     private let player: AVPlayer
     private let playerItem: AVPlayerItem
     private let imageGenerator: AVAssetImageGenerator
-    private var posterFrameTime: CMTime? {
-        didSet {
-            willChangeValueForKey("positionsLabelText")
-            didChangeValueForKey("positionsLabelText")
-        }
-    }
+    private var exportSession: AVAssetExportSession?
+    private var posterFrameTime: CMTime?
 
     private let playerView: AVPlayerView = AVPlayerView() ※ { v in
         v.controlsStyle = .Floating
@@ -51,16 +47,6 @@ class MovieDocumentViewController: NSViewController {
         tf.editable = false
         tf.drawsBackground = false
         tf.textColor = NSColor.grayColor()
-        tf.bind("stringValue", toObject: self, withKeyPath: "positionsLabelText", options: nil)
-    }
-    @objc private var positionsLabelText: String {
-        guard let time = posterFrameTime else { return "" }
-        let duration = CMTimeGetSeconds(time)
-        let minutes = Int(floor(duration / 60))
-        let seconds = Int(floor(duration - Double(minutes) * 60))
-        let milliseconds = Int((duration - floor(duration)) * 100)
-        let timeString = String(format: "%02d:%02d.%02d", minutes, seconds, milliseconds)
-        return "Poster Frame: \(timeString)"
     }
 
     private lazy var createLivePhotoButton: NSButton = NSButton() ※ { b in
@@ -69,7 +55,6 @@ class MovieDocumentViewController: NSViewController {
         b.bezelStyle = .RoundedBezelStyle
         b.target = self
         b.action = "createLivePhoto:"
-        b.bind("enabled", toObject: self.posterFrameView, withKeyPath: "image", options: [NSValueTransformerNameBindingOption: NSIsNotNilTransformerName])
     }
 
     init!(movieURL: NSURL) {
@@ -106,6 +91,7 @@ class MovieDocumentViewController: NSViewController {
         autolayout("V:[posterView][positionsLabel][createLivePhoto]-p-|")
 
         setupAspectRatioConstraints()
+        updateViews()
     }
 
     private func setupAspectRatioConstraints() {
@@ -122,11 +108,27 @@ class MovieDocumentViewController: NSViewController {
             toItem: self.playerView, attribute: .Height, multiplier: self.playerView.videoBounds.width / self.playerView.videoBounds.height, constant: 0))
     }
 
+    private func updateViews() {
+        createLivePhotoButton.enabled = (posterFrameView.image != nil && exportSession == nil)
+        positionsLabel.stringValue = positionsLabelText
+    }
+
+    private var positionsLabelText: String {
+        guard let time = posterFrameTime else { return "" }
+        let duration = CMTimeGetSeconds(time)
+        let minutes = Int(floor(duration / 60))
+        let seconds = Int(floor(duration - Double(minutes) * 60))
+        let milliseconds = Int((duration - floor(duration)) * 100)
+        let timeString = String(format: "%02d:%02d.%02d", minutes, seconds, milliseconds)
+        return "Poster Frame: \(timeString)"
+    }
+
     @objc private func capturePosterFrame(sender: AnyObject?) {
         guard let cgImage = try? imageGenerator.copyCGImageAtTime(player.currentTime(), actualTime: nil) else { return }
         let image = NSImage(CGImage: cgImage, size: CGSize(width: CGImageGetWidth(cgImage), height: CGImageGetHeight(cgImage)))
         posterFrameView.image = image
         posterFrameTime = player.currentTime()
+        updateViews()
     }
 
     @objc private func createLivePhoto(sender: AnyObject?) {
@@ -146,6 +148,7 @@ class MovieDocumentViewController: NSViewController {
         }
 
         guard image.TIFFRepresentation?.writeToFile(tmpImagePath, atomically: true) == true else { return }
+        // create AVAssetExportSession each time because it cannot be reused after export completion
         guard let session = AVAssetExportSession(asset: playerItem.asset, presetName: AVAssetExportPresetPassthrough) else { return }
         session.outputFileType = "com.apple.quicktime-movie"
         session.outputURL = NSURL(fileURLWithPath: tmpMoviePath)
@@ -168,8 +171,12 @@ class MovieDocumentViewController: NSViewController {
                 for path in [tmpImagePath, tmpMoviePath] {
                     let _ = try? NSFileManager.defaultManager().removeItemAtPath(path)
                 }
+                self.exportSession = nil
+                self.updateViews()
             }
         }
+        exportSession = session
+        updateViews()
     }
 
     private func showInFinderAndOpenInPhotos(fileURLs: [NSURL]) {
