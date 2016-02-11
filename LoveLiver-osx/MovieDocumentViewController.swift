@@ -14,6 +14,10 @@ import Ikemen
 
 
 class MovieDocumentViewController: NSViewController {
+    private let player: AVPlayer
+    private let playerItem: AVPlayerItem
+    private let imageGenerator: AVAssetImageGenerator
+
     private let playerView: AVPlayerView = AVPlayerView() ※ { v in
         v.controlsStyle = .Floating
         v.showsFrameSteppingButtons = true
@@ -41,8 +45,14 @@ class MovieDocumentViewController: NSViewController {
     }
 
     init!(movieURL: NSURL) {
+        playerItem = AVPlayerItem(URL: movieURL)
+        player = AVPlayer(playerItem: playerItem)
+        playerView.player = player
+        imageGenerator = AVAssetImageGenerator(asset: playerItem.asset) ※ {
+            $0.requestedTimeToleranceBefore = kCMTimeZero
+            $0.requestedTimeToleranceAfter = kCMTimeZero
+        }
         super.init(nibName: nil, bundle: nil)
-        playerView.player = AVPlayer(URL: movieURL)
     }
 
     required init?(coder: NSCoder) {
@@ -83,18 +93,12 @@ class MovieDocumentViewController: NSViewController {
     }
 
     @objc private func capturePosterFrame(sender: AnyObject?) {
-        guard let player = playerView.player else { return }
-        guard let asset = player.currentItem?.asset else { return }
-
-        let generator = AVAssetImageGenerator(asset: asset)
-        guard let cgImage = try? generator.copyCGImageAtTime(player.currentTime(), actualTime: nil) else { return }
+        guard let cgImage = try? imageGenerator.copyCGImageAtTime(player.currentTime(), actualTime: nil) else { return }
         let image = NSImage(CGImage: cgImage, size: CGSize(width: CGImageGetWidth(cgImage), height: CGImageGetHeight(cgImage)))
         posterFrameView.image = image
     }
 
     @objc private func createLivePhoto(sender: AnyObject?) {
-        guard let player = playerView.player else { return }
-        guard let asset = player.currentItem?.asset else { return }
         guard let image = posterFrameView.image else { return }
 
         let outputDir = NSURL(fileURLWithPath: NSHomeDirectory()).URLByAppendingPathComponent("Pictures/LoveLiver")
@@ -112,7 +116,7 @@ class MovieDocumentViewController: NSViewController {
         }
 
         guard image.TIFFRepresentation?.writeToFile(tmpImagePath, atomically: true) == true else { return }
-        guard let session = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetPassthrough) else { return }
+        guard let session = AVAssetExportSession(asset: playerItem.asset, presetName: AVAssetExportPresetPassthrough) else { return }
         session.outputFileType = "com.apple.quicktime-movie"
         session.outputURL = NSURL(fileURLWithPath: tmpMoviePath)
         session.timeRange = CMTimeRange(start: player.currentTime(), duration: CMTime(value: 3*600, timescale: 600))
