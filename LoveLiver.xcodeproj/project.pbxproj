@@ -47,7 +47,7 @@
 		3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LoveLiver_osx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4F0CA317E59A557EE5DD45B6 /* Pods-LoveLiver-osx.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoveLiver-osx.release.xcconfig"; path = "Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx.release.xcconfig"; sourceTree = "<group>"; };
 		DCD5B633553004CEA3DAF5F6 /* Pods-LoveLiver-osx.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoveLiver-osx.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx.debug.xcconfig"; sourceTree = "<group>"; };
-		EA379AB61C68DE6D00106AEF /* LoveLiver-osx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LoveLiver-osx.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA379AB61C68DE6D00106AEF /* LoveLiver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoveLiver.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA379AB81C68DE6D00106AEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EA379ABA1C68DE6D00106AEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EA379ABD1C68DE6D00106AEF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -99,7 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				133DFE251BC8B71100902407 /* LoveLiver */,
-				EA379AB61C68DE6D00106AEF /* LoveLiver-osx.app */,
+				EA379AB61C68DE6D00106AEF /* LoveLiver.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -184,7 +184,7 @@
 			);
 			name = "LoveLiver-osx";
 			productName = "LoveLiver-osx";
-			productReference = EA379AB61C68DE6D00106AEF /* LoveLiver-osx.app */;
+			productReference = EA379AB61C68DE6D00106AEF /* LoveLiver.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -426,7 +426,7 @@
 				INFOPLIST_FILE = "LoveLiver-osx/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.mzp.LoveLiver-osx";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = LoveLiver;
 			};
 			name = Debug;
 		};
@@ -440,7 +440,7 @@
 				INFOPLIST_FILE = "LoveLiver-osx/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.mzp.LoveLiver-osx";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = LoveLiver;
 			};
 			name = Release;
 		};
