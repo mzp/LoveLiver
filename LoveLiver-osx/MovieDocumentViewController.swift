@@ -3,7 +3,7 @@
 //  LoveLiver
 //
 //  Created by BAN Jun on 2016/02/09.
-//  Copyright © 2016年 mzp. All rights reserved.
+//  Copyright © 2016 mzp. All rights reserved.
 //
 
 import Cocoa
