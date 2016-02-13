@@ -8,11 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		133DFE291BC8B71100902407 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE281BC8B71100902407 /* main.swift */; };
-		133DFE371BC8C3E000902407 /* CommandLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE331BC8C3E000902407 /* CommandLine.swift */; settings = {ASSET_TAGS = (); }; };
-		133DFE381BC8C3E000902407 /* Option.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE351BC8C3E000902407 /* Option.swift */; settings = {ASSET_TAGS = (); }; };
-		133DFE391BC8C3E000902407 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE361BC8C3E000902407 /* StringExtensions.swift */; settings = {ASSET_TAGS = (); }; };
-		133DFE3B1BC8C69900902407 /* JPEG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3A1BC8C69900902407 /* JPEG.swift */; settings = {ASSET_TAGS = (); }; };
-		133DFE3D1BC8C6EF00902407 /* QuickTimeMov.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */; settings = {ASSET_TAGS = (); }; };
+		133DFE371BC8C3E000902407 /* CommandLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE331BC8C3E000902407 /* CommandLine.swift */; };
+		133DFE381BC8C3E000902407 /* Option.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE351BC8C3E000902407 /* Option.swift */; };
+		133DFE391BC8C3E000902407 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE361BC8C3E000902407 /* StringExtensions.swift */; };
+		133DFE3B1BC8C69900902407 /* JPEG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3A1BC8C69900902407 /* JPEG.swift */; };
+		133DFE3D1BC8C6EF00902407 /* QuickTimeMov.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */; };
+		C2C41F0CC51A39D97981D73D /* Pods_LoveLiver_osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */; };
+		EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379AB81C68DE6D00106AEF /* AppDelegate.swift */; };
+		EA379ABB1C68DE6D00106AEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EA379ABA1C68DE6D00106AEF /* Assets.xcassets */; };
+		EA379ABE1C68DE6D00106AEF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA379ABC1C68DE6D00106AEF /* MainMenu.xib */; };
+		EA379ADA1C6A283500106AEF /* MovieDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379AD81C6A283500106AEF /* MovieDocument.swift */; };
+		EA379ADD1C6A2E8800106AEF /* MovieDocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379ADC1C6A2E8800106AEF /* MovieDocumentViewController.swift */; };
+		EA379ADE1C6A33A500106AEF /* JPEG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3A1BC8C69900902407 /* JPEG.swift */; };
+		EA379ADF1C6A33A700106AEF /* QuickTimeMov.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,6 +44,16 @@
 		133DFE361BC8C3E000902407 /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		133DFE3A1BC8C69900902407 /* JPEG.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JPEG.swift; sourceTree = "<group>"; };
 		133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickTimeMov.swift; sourceTree = "<group>"; };
+		3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LoveLiver_osx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F0CA317E59A557EE5DD45B6 /* Pods-LoveLiver-osx.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoveLiver-osx.release.xcconfig"; path = "Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx.release.xcconfig"; sourceTree = "<group>"; };
+		DCD5B633553004CEA3DAF5F6 /* Pods-LoveLiver-osx.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoveLiver-osx.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx.debug.xcconfig"; sourceTree = "<group>"; };
+		EA379AB61C68DE6D00106AEF /* LoveLiver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoveLiver.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA379AB81C68DE6D00106AEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		EA379ABA1C68DE6D00106AEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		EA379ABD1C68DE6D00106AEF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		EA379ABF1C68DE6D00106AEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EA379AD81C6A283500106AEF /* MovieDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieDocument.swift; sourceTree = "<group>"; };
+		EA379ADC1C6A2E8800106AEF /* MovieDocumentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieDocumentViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,14 +64,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EA379AB31C68DE6D00106AEF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2C41F0CC51A39D97981D73D /* Pods_LoveLiver_osx.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0D762A778661040BF90B4214 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				DCD5B633553004CEA3DAF5F6 /* Pods-LoveLiver-osx.debug.xcconfig */,
+				4F0CA317E59A557EE5DD45B6 /* Pods-LoveLiver-osx.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		133DFE1C1BC8B71100902407 = {
 			isa = PBXGroup;
 			children = (
 				133DFE271BC8B71100902407 /* LoveLiver */,
+				EA379AB71C68DE6D00106AEF /* LoveLiver-osx */,
 				133DFE261BC8B71100902407 /* Products */,
+				0D762A778661040BF90B4214 /* Pods */,
+				A5911014E6D1DEA080967902 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -61,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				133DFE251BC8B71100902407 /* LoveLiver */,
+				EA379AB61C68DE6D00106AEF /* LoveLiver.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,6 +126,27 @@
 			path = CommandLine;
 			sourceTree = "<group>";
 		};
+		A5911014E6D1DEA080967902 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EA379AB71C68DE6D00106AEF /* LoveLiver-osx */ = {
+			isa = PBXGroup;
+			children = (
+				EA379AB81C68DE6D00106AEF /* AppDelegate.swift */,
+				EA379AD81C6A283500106AEF /* MovieDocument.swift */,
+				EA379ADC1C6A2E8800106AEF /* MovieDocumentViewController.swift */,
+				EA379ABA1C68DE6D00106AEF /* Assets.xcassets */,
+				EA379ABC1C68DE6D00106AEF /* MainMenu.xib */,
+				EA379ABF1C68DE6D00106AEF /* Info.plist */,
+			);
+			path = "LoveLiver-osx";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -107,17 +167,41 @@
 			productReference = 133DFE251BC8B71100902407 /* LoveLiver */;
 			productType = "com.apple.product-type.tool";
 		};
+		EA379AB51C68DE6D00106AEF /* LoveLiver-osx */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA379AC21C68DE6D00106AEF /* Build configuration list for PBXNativeTarget "LoveLiver-osx" */;
+			buildPhases = (
+				84A9B9667A59E6E73A3C7C91 /* Check Pods Manifest.lock */,
+				EA379AB21C68DE6D00106AEF /* Sources */,
+				EA379AB31C68DE6D00106AEF /* Frameworks */,
+				EA379AB41C68DE6D00106AEF /* Resources */,
+				B6AC598A4BA044ACC8349FBC /* Embed Pods Frameworks */,
+				2E4D54806FC3D28A38335C53 /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "LoveLiver-osx";
+			productName = "LoveLiver-osx";
+			productReference = EA379AB61C68DE6D00106AEF /* LoveLiver.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		133DFE1D1BC8B71100902407 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = mzp;
 				TargetAttributes = {
 					133DFE241BC8B71100902407 = {
 						CreatedOnToolsVersion = 7.0.1;
+					};
+					EA379AB51C68DE6D00106AEF = {
+						CreatedOnToolsVersion = 7.2;
 					};
 				};
 			};
@@ -127,6 +211,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 133DFE1C1BC8B71100902407;
 			productRefGroup = 133DFE261BC8B71100902407 /* Products */;
@@ -134,9 +219,70 @@
 			projectRoot = "";
 			targets = (
 				133DFE241BC8B71100902407 /* LoveLiver */,
+				EA379AB51C68DE6D00106AEF /* LoveLiver-osx */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EA379AB41C68DE6D00106AEF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA379ABB1C68DE6D00106AEF /* Assets.xcassets in Resources */,
+				EA379ABE1C68DE6D00106AEF /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2E4D54806FC3D28A38335C53 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		84A9B9667A59E6E73A3C7C91 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		B6AC598A4BA044ACC8349FBC /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		133DFE211BC8B71100902407 /* Sources */ = {
@@ -152,7 +298,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EA379AB21C68DE6D00106AEF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */,
+				EA379ADF1C6A33A700106AEF /* QuickTimeMov.swift in Sources */,
+				EA379ADA1C6A283500106AEF /* MovieDocument.swift in Sources */,
+				EA379ADD1C6A2E8800106AEF /* MovieDocumentViewController.swift in Sources */,
+				EA379ADE1C6A33A500106AEF /* JPEG.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		EA379ABC1C68DE6D00106AEF /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA379ABD1C68DE6D00106AEF /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		133DFE2A1BC8B71100902407 /* Debug */ = {
@@ -247,6 +416,34 @@
 			};
 			name = Release;
 		};
+		EA379AC01C68DE6D00106AEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DCD5B633553004CEA3DAF5F6 /* Pods-LoveLiver-osx.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "LoveLiver-osx/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "jp.mzp.LoveLiver-osx";
+				PRODUCT_NAME = LoveLiver;
+			};
+			name = Debug;
+		};
+		EA379AC11C68DE6D00106AEF /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4F0CA317E59A557EE5DD45B6 /* Pods-LoveLiver-osx.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "LoveLiver-osx/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "jp.mzp.LoveLiver-osx";
+				PRODUCT_NAME = LoveLiver;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -264,6 +461,15 @@
 			buildConfigurations = (
 				133DFE2D1BC8B71100902407 /* Debug */,
 				133DFE2E1BC8B71100902407 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA379AC21C68DE6D00106AEF /* Build configuration list for PBXNativeTarget "LoveLiver-osx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA379AC01C68DE6D00106AEF /* Debug */,
+				EA379AC11C68DE6D00106AEF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

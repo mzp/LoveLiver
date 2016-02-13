@@ -1,0 +1,4 @@
+scheme "LoveLiver-osx"
+clean true
+codesigning_identity "Developer ID Application"
+output_directory "./build"
