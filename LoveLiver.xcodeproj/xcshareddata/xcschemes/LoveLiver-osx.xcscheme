@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "EA379AB51C68DE6D00106AEF"
-               BuildableName = "LoveLiver-osx.app"
+               BuildableName = "LoveLiver.app"
                BlueprintName = "LoveLiver-osx"
                ReferencedContainer = "container:LoveLiver.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "EA379AB51C68DE6D00106AEF"
-            BuildableName = "LoveLiver-osx.app"
+            BuildableName = "LoveLiver.app"
             BlueprintName = "LoveLiver-osx"
             ReferencedContainer = "container:LoveLiver.xcodeproj">
          </BuildableReference>
@@ -56,7 +56,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "EA379AB51C68DE6D00106AEF"
-            BuildableName = "LoveLiver-osx.app"
+            BuildableName = "LoveLiver.app"
             BlueprintName = "LoveLiver-osx"
             ReferencedContainer = "container:LoveLiver.xcodeproj">
          </BuildableReference>
@@ -75,7 +75,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "EA379AB51C68DE6D00106AEF"
-            BuildableName = "LoveLiver-osx.app"
+            BuildableName = "LoveLiver.app"
             BlueprintName = "LoveLiver-osx"
             ReferencedContainer = "container:LoveLiver.xcodeproj">
          </BuildableReference>
