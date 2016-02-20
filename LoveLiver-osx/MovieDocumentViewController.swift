@@ -17,6 +17,7 @@ private let outputDir = NSURL(fileURLWithPath: NSHomeDirectory()).URLByAppending
 
 
 class MovieDocumentViewController: NSViewController {
+    private let movieURL: NSURL
     private let player: AVPlayer
     private let playerItem: AVPlayerItem
     private let imageGenerator: AVAssetImageGenerator
@@ -58,6 +59,7 @@ class MovieDocumentViewController: NSViewController {
     }
 
     init!(movieURL: NSURL) {
+        self.movieURL = movieURL
         playerItem = AVPlayerItem(URL: movieURL)
         player = AVPlayer(playerItem: playerItem)
         playerView.player = player
@@ -115,12 +117,7 @@ class MovieDocumentViewController: NSViewController {
 
     private var positionsLabelText: String {
         guard let time = posterFrameTime else { return "" }
-        let duration = CMTimeGetSeconds(time)
-        let minutes = Int(floor(duration / 60))
-        let seconds = Int(floor(duration - Double(minutes) * 60))
-        let milliseconds = Int((duration - floor(duration)) * 100)
-        let timeString = String(format: "%02d:%02d.%02d", minutes, seconds, milliseconds)
-        return "Poster Frame: \(timeString)"
+        return "Poster Frame: \(time.stringInmmssSS)"
     }
 
     @objc private func capturePosterFrame(sender: AnyObject?) {
@@ -137,10 +134,14 @@ class MovieDocumentViewController: NSViewController {
         guard let _ = try? NSFileManager.defaultManager().createDirectoryAtPath(outputDir.path!, withIntermediateDirectories: true, attributes: nil) else { return }
 
         let assetIdentifier = NSUUID().UUIDString
-        let tmpImagePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(assetIdentifier).tiff").path!
-        let tmpMoviePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(assetIdentifier).mov").path!
-        let imagePath = outputDir.URLByAppendingPathComponent("\(assetIdentifier).JPG").path!
-        let moviePath = outputDir.URLByAppendingPathComponent("\(assetIdentifier).MOV").path!
+        let basename = [
+            movieURL.lastPathComponent ?? "",
+            player.currentTime().stringInmmmsssSS,
+            assetIdentifier].joinWithSeparator("-")
+        let tmpImagePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(basename).tiff").path!
+        let tmpMoviePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(basename).mov").path!
+        let imagePath = outputDir.URLByAppendingPathComponent("\(basename).JPG").path!
+        let moviePath = outputDir.URLByAppendingPathComponent("\(basename).MOV").path!
         let paths = [tmpImagePath, tmpMoviePath, imagePath, moviePath]
 
         for path in paths {
@@ -193,3 +194,25 @@ class MovieDocumentViewController: NSViewController {
         }
     }
 }
+
+
+extension CMTime {
+    var msS: (Int, Int, Int) {
+        let duration = CMTimeGetSeconds(self)
+        let minutes = Int(floor(duration / 60))
+        let seconds = Int(floor(duration - Double(minutes) * 60))
+        let milliseconds = Int((duration - floor(duration)) * 100)
+        return (minutes, seconds, milliseconds)
+    }
+
+    var stringInmmssSS: String {
+        let (minutes, seconds, milliseconds) = msS
+        return String(format: "%02d:%02d.%02d", minutes, seconds, milliseconds)
+    }
+
+    var stringInmmmsssSS: String {
+        let (minutes, seconds, milliseconds) = msS
+        return String(format: "%02dm%02ds%02d", minutes, seconds, milliseconds)
+    }
+}
+
