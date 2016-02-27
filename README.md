@@ -1,6 +1,6 @@
 # LoveLiver
 
-![live photo demo](https://raw.githubusercontent.com/mzp/LoveLiver/master/demo.gif)
+![live photo demo](https://raw.githubusercontent.com/mzp/LoveLiver/m%40ster/demo.gif)
 
 LoveLiver is a Mac OS X GUI application and a CLI tool to create Apple's Live Photos from JPEG and MOV.
 
@@ -18,7 +18,7 @@ LoveLiver is a Mac OS X GUI application and a CLI tool to create Apple's Live Ph
 
 ### Usage
 
-1. Open movie files on LiveLover.app 
+1. Open movie files on LiveLover.app
 2. Set poster frame
 3. Seek movie position and `Create Live Photo`
 4. `Import All New Photos` on Photos.app
