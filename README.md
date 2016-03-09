@@ -11,6 +11,14 @@ LoveLiver is a Mac OS X GUI application and a CLI tool to create Apple's Live Ph
 
 ## GUI application
 
+<h3 align="center">
+  <a href="https://github.com/mzp/LoveLiver/releases">
+    <img src="https://raw.githubusercontent.com/mzp/LoveLiver/m%40ster/LoveLiver-osx/Assets.xcassets/AppIcon.appiconset/icon256.png" width="128" />
+    <br />
+    LoveLiver
+  </a>
+</h3>
+
 ### Install
 
 1. Go to the [releases page](https://github.com/mzp/LoveLiver/releases), find the version you want.
