@@ -15,7 +15,21 @@ private let overviewHeight: CGFloat = 64
 
 class MovieOverviewControl: NSView {
     var player: AVPlayer? {
-        didSet { reload() }
+        willSet {
+            guard let playerTimeObserver = playerTimeObserver else { return }
+            player?.removeTimeObserver(playerTimeObserver)
+        }
+        didSet {
+            reload()
+            observePlayer()
+        }
+    }
+    var playerTimeObserver: AnyObject?
+    var currentTimePercent: CGFloat? {
+        didSet {
+            // FIXME: redraw only dirty rect
+            setNeedsDisplayInRect(bounds)
+        }
     }
     var imageGenerator: AVAssetImageGenerator?
     var numberOfPages: UInt = 0 {
@@ -30,6 +44,8 @@ class MovieOverviewControl: NSView {
 
         setContentCompressionResistancePriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
         setContentHuggingPriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
+
+        observePlayer()
     }
 
     required init?(coder: NSCoder) {
@@ -79,6 +95,22 @@ class MovieOverviewControl: NSView {
         }
     }
 
+    func observePlayer() {
+        if let playerTimeObserver = playerTimeObserver {
+            player?.removeTimeObserver(playerTimeObserver)
+        }
+
+        if  let player = player,
+            let item = player.currentItem {
+                playerTimeObserver = player.addPeriodicTimeObserverForInterval(CMTime(value: 1, timescale: 30), queue: dispatch_get_main_queue()) { [weak self] time in
+                    let duration = item.duration
+                    self?.currentTimePercent =
+                        CGFloat(time.convertScale(duration.timescale, method: CMTimeRoundingMethod.Default).value)
+                        / CGFloat(duration.value)
+                }
+        }
+    }
+
     override func viewDidEndLiveResize() {
         super.viewDidEndLiveResize()
 
@@ -93,6 +125,11 @@ class MovieOverviewControl: NSView {
         for (i, t) in thumbnails.enumerate() {
             let pageRect = NSRect(x: CGFloat(i) * cellWidth, y: 0, width: cellWidth, height: bounds.height)
             t.drawInRect(pageRect)
+        }
+
+        if let currentTimePercent = currentTimePercent {
+            NSColor.redColor().setFill()
+            NSRectFillUsingOperation(NSRect(x: currentTimePercent * bounds.width, y: 0, width: 1, height: bounds.height), .CompositeCopy)
         }
     }
 
