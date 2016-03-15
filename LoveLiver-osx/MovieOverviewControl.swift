@@ -95,4 +95,13 @@ class MovieOverviewControl: NSView {
             t.drawInRect(pageRect)
         }
     }
+
+    override func mouseDown(theEvent: NSEvent) {
+        guard let item = player?.currentItem else { return }
+        let duration = item.duration
+
+        let p = convertPoint(theEvent.locationInWindow, fromView: nil)
+        let time = CMTime(value: Int64(CGFloat(duration.value) * p.x / bounds.width), timescale: duration.timescale)
+        player?.seekToTime(time)
+    }
 }
