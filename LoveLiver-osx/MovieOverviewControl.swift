@@ -8,6 +8,7 @@
 
 import Cocoa
 import AVFoundation
+import Ikemen
 
 
 private let overviewHeight: CGFloat = 64
@@ -77,15 +78,14 @@ class MovieOverviewControl: NSView {
         }
 
         // generate thumbnails for each page in background
-        let generator = AVAssetImageGenerator(asset: item.asset)
+        let generator = AVAssetImageGenerator(asset: item.asset) ※ {
+            $0.maximumSize = pageSize
+        }
         imageGenerator = generator
         generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
-            guard result == .Succeeded else { return }
+            guard let cgImage = cgImage where result == .Succeeded else { return }
 
-            let thumb = NSImage(size: pageSize)
-            thumb.lockFocus()
-            CGContextDrawImage(NSGraphicsContext.currentContext()!.CGContext, CGRect(origin: CGPointZero, size: NSSizeToCGSize(pageSize)), cgImage)
-            thumb.unlockFocus()
+            let thumb = NSImage(CGImage: cgImage, size: NSZeroSize)
 
             dispatch_async(dispatch_get_main_queue()) {
                 guard self.imageGenerator === generator else { return } // avoid appending result from outdated requests
