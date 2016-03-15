@@ -79,7 +79,8 @@ class MovieOverviewControl: NSView {
 
         // generate thumbnails for each page in background
         let generator = AVAssetImageGenerator(asset: item.asset) ※ {
-            $0.maximumSize = pageSize
+            let scale = window?.backingScaleFactor ?? 1
+            $0.maximumSize = CGSize(width: pageSize.width * scale, height: pageSize.height * scale)
         }
         imageGenerator = generator
         generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
