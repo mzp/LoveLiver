@@ -58,6 +58,8 @@ class MovieDocumentViewController: NSViewController {
         b.action = "createLivePhoto:"
     }
 
+    private lazy var overview: MovieOverviewControl = MovieOverviewControl(player: self.player)
+
     init!(movieURL: NSURL) {
         self.movieURL = movieURL
         playerItem = AVPlayerItem(URL: movieURL)
@@ -83,31 +85,37 @@ class MovieDocumentViewController: NSViewController {
             "posterView": posterFrameView,
             "createLivePhoto": createLivePhotoButton,
             "positionsLabel": positionsLabel,
+            "overview": overview,
             ])
         autolayout("H:|-p-[player]-p-[posterView(==player)]-p-|")
         autolayout("H:|-p-[posterButton(==player)]-p-[createLivePhoto(<=player)]-p-|")
         autolayout("H:[positionsLabel(==createLivePhoto)]-p-|")
-        autolayout("V:|-p-[player]-p-[posterButton]")
-        autolayout("V:|-p-[posterView]-p-[posterButton]")
-        autolayout("V:[posterButton]-p-|")
-        autolayout("V:[posterView][positionsLabel][createLivePhoto]-p-|")
+        autolayout("H:|-p-[overview]-p-|")
+        autolayout("V:|-p-[player]-p-[overview]")
+        autolayout("V:|-p-[posterView][positionsLabel(==p)][overview]")
+        autolayout("V:[overview]-p-[posterButton]-p-|")
+        autolayout("V:[overview]-p-[createLivePhoto]-p-|")
 
-        setupAspectRatioConstraints()
+        waitForMovieLoaded()
         updateViews()
     }
 
-    private func setupAspectRatioConstraints() {
-        // wait until movie is loaded
+    private func waitForMovieLoaded() {
         guard playerView.videoBounds.width > 0 && playerView.videoBounds.height > 0 else {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-                self.setupAspectRatioConstraints()
+                self.waitForMovieLoaded()
             }
             return
         }
+        movieDidLoad()
+    }
 
+    private func movieDidLoad() {
         self.playerView.addConstraint(NSLayoutConstraint(
             item: self.playerView, attribute: .Width, relatedBy: .Equal,
             toItem: self.playerView, attribute: .Height, multiplier: self.playerView.videoBounds.width / self.playerView.videoBounds.height, constant: 0))
+
+        overview.reload()
     }
 
     private func updateViews() {
@@ -121,9 +129,7 @@ class MovieDocumentViewController: NSViewController {
     }
 
     @objc private func capturePosterFrame(sender: AnyObject?) {
-        guard let cgImage = try? imageGenerator.copyCGImageAtTime(player.currentTime(), actualTime: nil) else { return }
-        let image = NSImage(CGImage: cgImage, size: CGSize(width: CGImageGetWidth(cgImage), height: CGImageGetHeight(cgImage)))
-        posterFrameView.image = image
+        posterFrameView.image = imageGenerator.copyImage(at: player.currentTime())
         posterFrameTime = player.currentTime()
         updateViews()
     }
@@ -216,3 +222,10 @@ extension CMTime {
     }
 }
 
+
+extension AVAssetImageGenerator {
+    func copyImage(at time: CMTime) -> NSImage? {
+        guard let cgImage = try? copyCGImageAtTime(time, actualTime: nil) else { return nil }
+        return NSImage(CGImage: cgImage, size: CGSize(width: CGImageGetWidth(cgImage), height: CGImageGetHeight(cgImage)))
+    }
+}

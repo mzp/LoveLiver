@@ -14,6 +14,7 @@
 		133DFE3B1BC8C69900902407 /* JPEG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3A1BC8C69900902407 /* JPEG.swift */; };
 		133DFE3D1BC8C6EF00902407 /* QuickTimeMov.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */; };
 		C2C41F0CC51A39D97981D73D /* Pods_LoveLiver_osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */; };
+		EA27F5EF1C98426A00C23F40 /* MovieOverviewControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */; };
 		EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379AB81C68DE6D00106AEF /* AppDelegate.swift */; };
 		EA379ABB1C68DE6D00106AEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EA379ABA1C68DE6D00106AEF /* Assets.xcassets */; };
 		EA379ABE1C68DE6D00106AEF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA379ABC1C68DE6D00106AEF /* MainMenu.xib */; };
@@ -47,6 +48,7 @@
 		3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LoveLiver_osx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4F0CA317E59A557EE5DD45B6 /* Pods-LoveLiver-osx.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoveLiver-osx.release.xcconfig"; path = "Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx.release.xcconfig"; sourceTree = "<group>"; };
 		DCD5B633553004CEA3DAF5F6 /* Pods-LoveLiver-osx.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoveLiver-osx.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx.debug.xcconfig"; sourceTree = "<group>"; };
+		EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieOverviewControl.swift; sourceTree = "<group>"; };
 		EA379AB61C68DE6D00106AEF /* LoveLiver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoveLiver.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA379AB81C68DE6D00106AEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EA379ABA1C68DE6D00106AEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 				EA379AB81C68DE6D00106AEF /* AppDelegate.swift */,
 				EA379AD81C6A283500106AEF /* MovieDocument.swift */,
 				EA379ADC1C6A2E8800106AEF /* MovieDocumentViewController.swift */,
+				EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */,
 				EA379ABA1C68DE6D00106AEF /* Assets.xcassets */,
 				EA379ABC1C68DE6D00106AEF /* MainMenu.xib */,
 				EA379ABF1C68DE6D00106AEF /* Info.plist */,
@@ -305,6 +308,7 @@
 				EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */,
 				EA379ADF1C6A33A700106AEF /* QuickTimeMov.swift in Sources */,
 				EA379ADA1C6A283500106AEF /* MovieDocument.swift in Sources */,
+				EA27F5EF1C98426A00C23F40 /* MovieOverviewControl.swift in Sources */,
 				EA379ADD1C6A2E8800106AEF /* MovieDocumentViewController.swift in Sources */,
 				EA379ADE1C6A33A500106AEF /* JPEG.swift in Sources */,
 			);
