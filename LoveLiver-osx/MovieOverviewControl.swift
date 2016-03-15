@@ -17,6 +17,7 @@ class MovieOverviewControl: NSView {
     var player: AVPlayer? {
         didSet { reload() }
     }
+    var imageGenerator: AVAssetImageGenerator?
     var numberOfPages: UInt = 0 {
         didSet { setNeedsDisplayInRect(bounds) }
     }
@@ -41,30 +42,39 @@ class MovieOverviewControl: NSView {
     }
 
     func reload() {
+        imageGenerator?.cancelAllCGImageGeneration()
+        imageGenerator = nil
         thumbnails.removeAll()
+
         guard let item = player?.currentItem,
             let track = item.asset.tracksWithMediaType(AVMediaTypeVideo).first else {
                 numberOfPages = 0
                 return
         }
 
-        let thumbSize = NSSize(width: bounds.height / track.naturalSize.height * track.naturalSize.width, height: bounds.height)
-        numberOfPages = UInt(ceil(bounds.width / thumbSize.width))
+        // each page preserves aspect ratio of video and varies number of pages so that fill self.bounds.width
+        let pageSize = NSSize(width: bounds.height / track.naturalSize.height * track.naturalSize.width, height: bounds.height)
+        numberOfPages = UInt(ceil(bounds.width / pageSize.width))
         let duration = item.duration
+        let times: [CMTime] = (0..<numberOfPages).map { i in
+            CMTime(value: duration.value * Int64(i) / Int64(numberOfPages), timescale: duration.timescale)
+        }
 
-        dispatch_async(dispatch_get_global_queue(0, 0)) {
-            let generator = AVAssetImageGenerator(asset: item.asset)
-            for i in 0..<self.numberOfPages {
-                let thumb = NSImage(size: thumbSize)
-                thumb.lockFocus()
-                let frameImage = generator.copyImage(at: CMTime(value: duration.value * Int64(i) / Int64(self.numberOfPages), timescale: duration.timescale))
-                frameImage?.drawInRect(NSRect(origin: CGPointZero, size: NSSizeToCGSize(thumbSize)))
-                thumb.unlockFocus()
-                
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.thumbnails.append(thumb)
-                    self.setNeedsDisplayInRect(self.bounds)
-                }
+        // generate thumbnails for each page in background
+        let generator = AVAssetImageGenerator(asset: item.asset)
+        imageGenerator = generator
+        generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
+            guard result == .Succeeded else { return }
+
+            let thumb = NSImage(size: pageSize)
+            thumb.lockFocus()
+            CGContextDrawImage(NSGraphicsContext.currentContext()!.CGContext, CGRect(origin: CGPointZero, size: NSSizeToCGSize(pageSize)), cgImage)
+            thumb.unlockFocus()
+
+            dispatch_async(dispatch_get_main_queue()) {
+                guard self.imageGenerator === generator else { return } // avoid appending result from outdated requests
+                self.thumbnails.append(thumb)
+                self.setNeedsDisplayInRect(self.bounds)
             }
         }
     }
