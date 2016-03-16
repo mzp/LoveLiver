@@ -138,10 +138,11 @@ class MovieOverviewControl: NSView {
         NSColor.blackColor().setFill()
         NSRectFillUsingOperation(dirtyRect, .CompositeCopy)
 
-        let cellWidth = bounds.width / CGFloat(numberOfPages)
-        for (i, t) in thumbnails.enumerate() {
-            let pageRect = NSRect(x: CGFloat(i) * cellWidth, y: 0, width: cellWidth, height: bounds.height)
+        var x: CGFloat = 0
+        for t in thumbnails {
+            let pageRect = NSRect(x: x, y: 0, width: bounds.height / t.size.height * t.size.width, height: bounds.height)
             t.drawInRect(pageRect)
+            x += pageRect.width
         }
     }
 
