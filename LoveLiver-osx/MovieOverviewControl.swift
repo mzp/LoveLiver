@@ -9,6 +9,7 @@
 import Cocoa
 import AVFoundation
 import Ikemen
+import NorthLayout
 
 
 private let overviewHeight: CGFloat = 64
@@ -27,10 +28,12 @@ class MovieOverviewControl: NSView {
     }
     var playerTimeObserver: AnyObject?
     var currentTimePercent: CGFloat? {
-        didSet {
-            // FIXME: redraw only dirty rect
-            setNeedsDisplayInRect(bounds)
-        }
+        didSet { updateCurrentTimeBar() }
+    }
+    private lazy var currentTimeBar: NSView = NSView(frame: NSZeroRect) ※ { v in
+        v.wantsLayer = true
+        v.layer?.backgroundColor = NSColor.redColor().CGColor
+        self.addSubview(v)
     }
     var imageGenerator: AVAssetImageGenerator?
     var numberOfPages: UInt = 0 {
@@ -118,6 +121,19 @@ class MovieOverviewControl: NSView {
         reload()
     }
 
+    override var frame: NSRect {
+        didSet { updateCurrentTimeBar() }
+    }
+
+    private func updateCurrentTimeBar() {
+        if let p = currentTimePercent {
+            currentTimeBar.hidden = false
+            currentTimeBar.frame = NSRect(x: p * bounds.width, y: 0, width: 1, height: bounds.height)
+        } else {
+            currentTimeBar.hidden = true
+        }
+    }
+
     override func drawRect(dirtyRect: NSRect) {
         NSColor.blackColor().setFill()
         NSRectFillUsingOperation(dirtyRect, .CompositeCopy)
@@ -126,11 +142,6 @@ class MovieOverviewControl: NSView {
         for (i, t) in thumbnails.enumerate() {
             let pageRect = NSRect(x: CGFloat(i) * cellWidth, y: 0, width: cellWidth, height: bounds.height)
             t.drawInRect(pageRect)
-        }
-
-        if let currentTimePercent = currentTimePercent {
-            NSColor.redColor().setFill()
-            NSRectFillUsingOperation(NSRect(x: currentTimePercent * bounds.width, y: 0, width: 1, height: bounds.height), .CompositeCopy)
         }
     }
 
