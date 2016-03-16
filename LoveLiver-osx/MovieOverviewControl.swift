@@ -27,14 +27,23 @@ class MovieOverviewControl: NSView {
         }
     }
     var playerTimeObserver: AnyObject?
-    var currentTimePercent: CGFloat? {
-        didSet { updateCurrentTimeBar() }
+    var currentTime: CMTime? {
+        didSet { updateCurrentTime() }
     }
     private lazy var currentTimeBar: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
         v.layer?.backgroundColor = NSColor.redColor().CGColor
         self.addSubview(v)
     }
+    private lazy var currentTimeLabel: NSTextField = NSTextField(frame: NSZeroRect) ※ { tf in
+        tf.bezeled = false
+        tf.editable = false
+        tf.drawsBackground = true
+        tf.font = NSFont.monospacedDigitSystemFontOfSize(12, weight: NSFontWeightRegular)
+        tf.textColor = NSColor.whiteColor()
+        tf.backgroundColor = NSColor.blackColor()
+    }
+
     var imageGenerator: AVAssetImageGenerator?
     var numberOfPages: UInt = 0 {
         didSet { setNeedsDisplayInRect(bounds) }
@@ -46,10 +55,17 @@ class MovieOverviewControl: NSView {
         
         super.init(frame: NSZeroRect)
 
+        let autolayout = northLayoutFormat([:], [
+            "currentTime": currentTimeLabel,
+            ])
+        autolayout("H:|[currentTime]")
+        autolayout("V:[currentTime]|")
+
         setContentCompressionResistancePriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
         setContentHuggingPriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
 
         observePlayer()
+        updateCurrentTime()
     }
 
     required init?(coder: NSCoder) {
@@ -104,14 +120,8 @@ class MovieOverviewControl: NSView {
             player?.removeTimeObserver(playerTimeObserver)
         }
 
-        if  let player = player,
-            let item = player.currentItem {
-                playerTimeObserver = player.addPeriodicTimeObserverForInterval(CMTime(value: 1, timescale: 30), queue: dispatch_get_main_queue()) { [weak self] time in
-                    let duration = item.duration
-                    self?.currentTimePercent =
-                        CGFloat(time.convertScale(duration.timescale, method: CMTimeRoundingMethod.Default).value)
-                        / CGFloat(duration.value)
-                }
+        playerTimeObserver = player?.addPeriodicTimeObserverForInterval(CMTime(value: 1, timescale: 30), queue: dispatch_get_main_queue()) { [weak self] time in
+            self?.currentTime = time
         }
     }
 
@@ -122,15 +132,21 @@ class MovieOverviewControl: NSView {
     }
 
     override var frame: NSRect {
-        didSet { updateCurrentTimeBar() }
+        didSet { updateCurrentTime() }
     }
 
-    private func updateCurrentTimeBar() {
-        if let p = currentTimePercent {
-            currentTimeBar.hidden = false
-            currentTimeBar.frame = NSRect(x: p * bounds.width, y: 0, width: 1, height: bounds.height)
+    private func updateCurrentTime() {
+        if  let item = player?.currentItem,
+            let time = currentTime {
+                let duration = item.duration
+                let p = CGFloat(time.convertScale(duration.timescale, method: CMTimeRoundingMethod.Default).value)
+                    / CGFloat(duration.value)
+                currentTimeBar.hidden = false
+                currentTimeBar.frame = NSRect(x: p * bounds.width, y: 0, width: 1, height: bounds.height)
+                currentTimeLabel.stringValue = time.stringInmmssSS
         } else {
             currentTimeBar.hidden = true
+            currentTimeLabel.stringValue = "--:--.--"
         }
     }
 
