@@ -147,11 +147,19 @@ class MovieOverviewControl: NSView {
     }
 
     override func mouseDown(theEvent: NSEvent) {
+        seekToMousePosition(theEvent)
+    }
+
+    override func mouseDragged(theEvent: NSEvent) {
+        seekToMousePosition(theEvent)
+    }
+
+    private func seekToMousePosition(theEvent: NSEvent) {
         guard let item = player?.currentItem else { return }
         let duration = item.duration
 
         let p = convertPoint(theEvent.locationInWindow, fromView: nil)
         let time = CMTime(value: Int64(CGFloat(duration.value) * p.x / bounds.width), timescale: duration.timescale)
-        player?.seekToTime(time)
+        player?.seekToTime(time, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
     }
 }
