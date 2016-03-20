@@ -113,6 +113,11 @@ class MovieDocumentViewController: NSViewController {
         posterFrameView.image = imageGenerator.copyImage(at: player.currentTime())
         posterFrameTime = player.currentTime()
         updateViews()
+
+        let popover = NSPopover()
+        popover.behavior = .Transient
+        popover.contentViewController = LivePhotoSandboxViewController(player: player)
+        popover.showRelativeToRect(posterFrameButton.bounds, ofView: posterFrameButton, preferredEdge: NSRectEdge.MinY)
     }
 
     @objc private func createLivePhoto(sender: AnyObject?) {
