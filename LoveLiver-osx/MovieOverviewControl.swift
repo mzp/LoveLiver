@@ -16,16 +16,7 @@ private let overviewHeight: CGFloat = 64
 
 
 class MovieOverviewControl: NSView {
-    var player: AVPlayer? {
-        willSet {
-            guard let playerTimeObserver = playerTimeObserver else { return }
-            player?.removeTimeObserver(playerTimeObserver)
-        }
-        didSet {
-            reload()
-            observePlayer()
-        }
-    }
+    let player: AVPlayer
     var playerTimeObserver: AnyObject?
     var currentTime: CMTime? {
         didSet { updateCurrentTime() }
@@ -69,8 +60,7 @@ class MovieOverviewControl: NSView {
     }
 
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        return nil
+        fatalError("init(coder:) has not been implemented")
     }
 
     override var intrinsicContentSize: NSSize {
@@ -82,14 +72,14 @@ class MovieOverviewControl: NSView {
         imageGenerator = nil
         thumbnails.removeAll()
 
-        guard let item = player?.currentItem,
-            let track = item.asset.tracksWithMediaType(AVMediaTypeVideo).first else {
+        guard let item = player.currentItem,
+            let videoSize = item.naturalSize else {
                 numberOfPages = 0
                 return
         }
 
         // each page preserves aspect ratio of video and varies number of pages so that fill self.bounds.width
-        let pageSize = NSSize(width: bounds.height / track.naturalSize.height * track.naturalSize.width, height: bounds.height)
+        let pageSize = NSSize(width: bounds.height / videoSize.height * videoSize.width, height: bounds.height)
         numberOfPages = UInt(ceil(bounds.width / pageSize.width))
         let duration = item.duration
         let times: [CMTime] = (0..<numberOfPages).map { i in
@@ -117,10 +107,10 @@ class MovieOverviewControl: NSView {
 
     func observePlayer() {
         if let playerTimeObserver = playerTimeObserver {
-            player?.removeTimeObserver(playerTimeObserver)
+            player.removeTimeObserver(playerTimeObserver)
         }
 
-        playerTimeObserver = player?.addPeriodicTimeObserverForInterval(CMTime(value: 1, timescale: 30), queue: dispatch_get_main_queue()) { [weak self] time in
+        playerTimeObserver = player.addPeriodicTimeObserverForInterval(CMTime(value: 1, timescale: 30), queue: dispatch_get_main_queue()) { [weak self] time in
             self?.currentTime = time
         }
     }
@@ -136,7 +126,7 @@ class MovieOverviewControl: NSView {
     }
 
     private func updateCurrentTime() {
-        if  let item = player?.currentItem,
+        if  let item = player.currentItem,
             let time = currentTime {
                 let duration = item.duration
                 let p = CGFloat(time.convertScale(duration.timescale, method: CMTimeRoundingMethod.Default).value)
@@ -171,11 +161,11 @@ class MovieOverviewControl: NSView {
     }
 
     private func seekToMousePosition(theEvent: NSEvent) {
-        guard let item = player?.currentItem else { return }
+        guard let item = player.currentItem else { return }
         let duration = item.duration
 
         let p = convertPoint(theEvent.locationInWindow, fromView: nil)
         let time = CMTime(value: Int64(CGFloat(duration.value) * p.x / bounds.width), timescale: duration.timescale)
-        player?.seekToTime(time, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+        player.seekToTime(time, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
     }
 }

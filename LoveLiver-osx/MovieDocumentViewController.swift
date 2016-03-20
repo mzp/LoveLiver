@@ -58,12 +58,10 @@ class MovieDocumentViewController: NSViewController {
         b.action = "createLivePhoto:"
     }
 
-    private lazy var overview: MovieOverviewControl = MovieOverviewControl(player: self.player)
-
-    init!(movieURL: NSURL) {
+    init!(movieURL: NSURL, playerItem: AVPlayerItem, player: AVPlayer) {
         self.movieURL = movieURL
-        playerItem = AVPlayerItem(URL: movieURL)
-        player = AVPlayer(playerItem: playerItem)
+        self.playerItem = playerItem
+        self.player = player
         playerView.player = player
         imageGenerator = AVAssetImageGenerator(asset: playerItem.asset) ※ {
             $0.requestedTimeToleranceBefore = kCMTimeZero
@@ -85,37 +83,20 @@ class MovieDocumentViewController: NSViewController {
             "posterView": posterFrameView,
             "createLivePhoto": createLivePhotoButton,
             "positionsLabel": positionsLabel,
-            "overview": overview,
             ])
         autolayout("H:|-p-[player]-p-[posterView(==player)]-p-|")
         autolayout("H:|-p-[posterButton(==player)]-p-[createLivePhoto(<=player)]-p-|")
         autolayout("H:[positionsLabel(==createLivePhoto)]-p-|")
-        autolayout("H:|-p-[overview]-p-|")
-        autolayout("V:|-p-[player]-p-[overview]")
-        autolayout("V:|-p-[posterView][positionsLabel(==p)][overview]")
-        autolayout("V:[overview]-p-[posterButton]-p-|")
-        autolayout("V:[overview]-p-[createLivePhoto]-p-|")
+        autolayout("V:|-p-[player]-p-[posterButton]-p-|")
+        autolayout("V:|-p-[posterView][positionsLabel(==p)][createLivePhoto]-p-|")
 
-        waitForMovieLoaded()
         updateViews()
     }
 
-    private func waitForMovieLoaded() {
-        guard playerView.videoBounds.width > 0 && playerView.videoBounds.height > 0 else {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-                self.waitForMovieLoaded()
-            }
-            return
-        }
-        movieDidLoad()
-    }
-
-    private func movieDidLoad() {
+    func movieDidLoad(videoSize: CGSize) {
         self.playerView.addConstraint(NSLayoutConstraint(
             item: self.playerView, attribute: .Width, relatedBy: .Equal,
-            toItem: self.playerView, attribute: .Height, multiplier: self.playerView.videoBounds.width / self.playerView.videoBounds.height, constant: 0))
-
-        overview.reload()
+            toItem: self.playerView, attribute: .Height, multiplier: videoSize.width / videoSize.height, constant: 0))
     }
 
     private func updateViews() {
@@ -198,34 +179,5 @@ class MovieDocumentViewController: NSViewController {
             }
             NSWorkspace.sharedWorkspace().openURLs(fileURLs, withAppBundleIdentifier: "com.apple.Photos", options: [], additionalEventParamDescriptor: nil, launchIdentifiers: nil)
         }
-    }
-}
-
-
-extension CMTime {
-    var msS: (Int, Int, Int) {
-        let duration = CMTimeGetSeconds(self)
-        let minutes = Int(floor(duration / 60))
-        let seconds = Int(floor(duration - Double(minutes) * 60))
-        let milliseconds = Int((duration - floor(duration)) * 100)
-        return (minutes, seconds, milliseconds)
-    }
-
-    var stringInmmssSS: String {
-        let (minutes, seconds, milliseconds) = msS
-        return String(format: "%02d:%02d.%02d", minutes, seconds, milliseconds)
-    }
-
-    var stringInmmmsssSS: String {
-        let (minutes, seconds, milliseconds) = msS
-        return String(format: "%02dm%02ds%02d", minutes, seconds, milliseconds)
-    }
-}
-
-
-extension AVAssetImageGenerator {
-    func copyImage(at time: CMTime) -> NSImage? {
-        guard let cgImage = try? copyCGImageAtTime(time, actualTime: nil) else { return nil }
-        return NSImage(CGImage: cgImage, size: CGSize(width: CGImageGetWidth(cgImage), height: CGImageGetHeight(cgImage)))
     }
 }
