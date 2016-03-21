@@ -13,15 +13,11 @@ import NorthLayout
 import Ikemen
 
 
-private let outputDir = NSURL(fileURLWithPath: NSHomeDirectory()).URLByAppendingPathComponent("Pictures/LoveLiver")
-
-
 class MovieDocumentViewController: NSViewController {
     private let movieURL: NSURL
     private let player: AVPlayer
     private let playerItem: AVPlayerItem
     private let imageGenerator: AVAssetImageGenerator
-    private var exportSession: AVAssetExportSession?
     private var posterFrameTime: CMTime?
 
     private let playerView: AVPlayerView = AVPlayerView() ※ { v in
@@ -100,7 +96,7 @@ class MovieDocumentViewController: NSViewController {
     }
 
     private func updateViews() {
-        createLivePhotoButton.enabled = (posterFrameView.image != nil && exportSession == nil)
+        createLivePhotoButton.enabled = (posterFrameView.image != nil)
         positionsLabel.stringValue = positionsLabelText
     }
 
@@ -114,7 +110,7 @@ class MovieDocumentViewController: NSViewController {
         posterFrameTime = player.currentTime()
         updateViews()
 
-        let livephotoSandboxVC = LivePhotoSandboxViewController(player: player)
+        let livephotoSandboxVC = LivePhotoSandboxViewController(player: player, baseFilename: movieURL.lastPathComponent ?? "unknown")
         let popover = NSPopover()
         livephotoSandboxVC.closeAction = {
             popover.performClose(nil)
@@ -122,71 +118,5 @@ class MovieDocumentViewController: NSViewController {
         popover.behavior = .Semitransient
         popover.contentViewController = livephotoSandboxVC
         popover.showRelativeToRect(posterFrameButton.bounds, ofView: posterFrameButton, preferredEdge: NSRectEdge.MinY)
-    }
-
-    @objc private func createLivePhoto(sender: AnyObject?) {
-        guard let image = posterFrameView.image else { return }
-
-        guard let _ = try? NSFileManager.defaultManager().createDirectoryAtPath(outputDir.path!, withIntermediateDirectories: true, attributes: nil) else { return }
-
-        let assetIdentifier = NSUUID().UUIDString
-        let basename = [
-            movieURL.lastPathComponent ?? "",
-            player.currentTime().stringInmmmsssSS,
-            assetIdentifier].joinWithSeparator("-")
-        let tmpImagePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(basename).tiff").path!
-        let tmpMoviePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(basename).mov").path!
-        let imagePath = outputDir.URLByAppendingPathComponent("\(basename).JPG").path!
-        let moviePath = outputDir.URLByAppendingPathComponent("\(basename).MOV").path!
-        let paths = [tmpImagePath, tmpMoviePath, imagePath, moviePath]
-
-        for path in paths {
-            guard !NSFileManager.defaultManager().fileExistsAtPath(path) else { return }
-        }
-
-        guard image.TIFFRepresentation?.writeToFile(tmpImagePath, atomically: true) == true else { return }
-        // create AVAssetExportSession each time because it cannot be reused after export completion
-        guard let session = AVAssetExportSession(asset: playerItem.asset, presetName: AVAssetExportPresetPassthrough) else { return }
-        session.outputFileType = "com.apple.quicktime-movie"
-        session.outputURL = NSURL(fileURLWithPath: tmpMoviePath)
-        session.timeRange = CMTimeRange(start: player.currentTime(), duration: CMTime(value: 3*600, timescale: 600))
-        session.exportAsynchronouslyWithCompletionHandler {
-            dispatch_async(dispatch_get_main_queue()) {
-                switch session.status {
-                case .Completed:
-                    JPEG(path: tmpImagePath).write(imagePath, assetIdentifier: assetIdentifier)
-                    NSLog("%@", "LivePhoto JPEG created: \(imagePath)")
-
-                    QuickTimeMov(path: tmpMoviePath).write(moviePath, assetIdentifier: assetIdentifier)
-                    NSLog("%@", "LivePhoto MOV created: \(moviePath)")
-
-                    self.showInFinderAndOpenInPhotos([imagePath, moviePath].map{NSURL(fileURLWithPath: $0)})
-                case .Cancelled, .Exporting, .Failed, .Unknown, .Waiting:
-                    NSLog("%@", "exportAsynchronouslyWithCompletionHandler = \(session.status)")
-                }
-
-                for path in [tmpImagePath, tmpMoviePath] {
-                    let _ = try? NSFileManager.defaultManager().removeItemAtPath(path)
-                }
-                self.exportSession = nil
-                self.updateViews()
-            }
-        }
-        exportSession = session
-        updateViews()
-    }
-
-    private func showInFinderAndOpenInPhotos(fileURLs: [NSURL]) {
-        NSWorkspace.sharedWorkspace().activateFileViewerSelectingURLs(fileURLs)
-
-        // wait until Finder is active or timed out,
-        // to avoid openURLs overtaking Finder activation
-        dispatch_async(dispatch_get_global_queue(0, 0)) {
-            let start = NSDate()
-            while NSWorkspace.sharedWorkspace().frontmostApplication?.bundleIdentifier != "com.apple.finder" && NSDate().timeIntervalSinceDate(start) < 5 {
-                NSThread.sleepForTimeInterval(0.1)
-            }
-            NSWorkspace.sharedWorkspace().openURLs(fileURLs, withAppBundleIdentifier: "com.apple.Photos", options: [], additionalEventParamDescriptor: nil, launchIdentifiers: nil)
-        }
     }
 }
