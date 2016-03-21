@@ -114,9 +114,13 @@ class MovieDocumentViewController: NSViewController {
         posterFrameTime = player.currentTime()
         updateViews()
 
+        let livephotoSandboxVC = LivePhotoSandboxViewController(player: player)
         let popover = NSPopover()
-        popover.behavior = .Transient
-        popover.contentViewController = LivePhotoSandboxViewController(player: player)
+        livephotoSandboxVC.closeAction = {
+            popover.performClose(nil)
+        }
+        popover.behavior = .Semitransient
+        popover.contentViewController = livephotoSandboxVC
         popover.showRelativeToRect(posterFrameButton.bounds, ofView: posterFrameButton, preferredEdge: NSRectEdge.MinY)
     }
 
