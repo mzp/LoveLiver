@@ -61,6 +61,8 @@ class MovieDocumentViewController: NSViewController {
     }
 
     @objc private func createLivePhotoSandbox() {
+        player.pause()
+
         let livephotoSandboxVC = LivePhotoSandboxViewController(player: player, baseFilename: movieURL.lastPathComponent ?? "unknown")
         let popover = NSPopover()
         livephotoSandboxVC.closeAction = {
