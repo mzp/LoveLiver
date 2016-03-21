@@ -45,8 +45,15 @@ class MovieOverviewControl: NSView {
     // overview control supports timmed playback and scope edit
     var trimRange: CMTimeRange { didSet { reload() } } // show overview only within trimRange
     var scopeRange: CMTimeRange? { // if non-nil, shows scope control
-        didSet { updateScope() }
+        didSet {
+            if let old = oldValue, let new = scopeRange where CMTimeRangeEqual(old, new) {
+                return
+            }
+            updateScope()
+            onScopeChange?(dragging: mouseDownLocation != nil)
+        }
     }
+    var onScopeChange: ((dragging: Bool) -> Void)?
     private lazy var scopeMaskLeftView: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
         v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).CGColor
@@ -57,6 +64,11 @@ class MovieOverviewControl: NSView {
         v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).CGColor
         v.hidden = true
     }
+
+    enum DraggingMode {
+        case Seek, Scope
+    }
+    var draggingMode = DraggingMode.Seek
 
     init(player: AVPlayer, playerItem: AVPlayerItem) {
         self.player = player
@@ -181,12 +193,21 @@ class MovieOverviewControl: NSView {
             scopeMaskLeftView.frame = NSRect(x: 0, y: 0, width: startPercent * bounds.width, height: bounds.height)
             scopeMaskRightView.frame = NSRect(x: endPercent * bounds.width, y: 0, width: bounds.width - endPercent * bounds.width, height: bounds.height)
 
-            player.currentItem?.forwardPlaybackEndTime = s.end
+            updateForwardPlaybackEndTime()
         } else {
             scopeMaskLeftView.hidden = true
             scopeMaskRightView.hidden = true
 
             player.currentItem?.forwardPlaybackEndTime = trimRange.end
+        }
+    }
+
+    private func updateForwardPlaybackEndTime() {
+        // scope playback to end of scopeRange
+        // this is relatively heavy operation. ignore on dragging
+
+        if let s = scopeRange where mouseDownLocation == nil {
+            player.currentItem?.forwardPlaybackEndTime = s.end
         }
     }
 
@@ -202,17 +223,56 @@ class MovieOverviewControl: NSView {
         }
     }
 
+    private var mouseDownLocation: NSPoint?
+    private var scopeRangeOnMouseDown: CMTimeRange?
+
     override func mouseDown(theEvent: NSEvent) {
-        seekToMousePosition(theEvent)
+        mouseDownLocation = convertPoint(theEvent.locationInWindow, fromView: nil)
+        scopeRangeOnMouseDown = scopeRange
+
+        switch draggingMode {
+        case .Seek: seekToMousePosition(theEvent)
+        case .Scope: break
+        }
     }
 
     override func mouseDragged(theEvent: NSEvent) {
-        seekToMousePosition(theEvent)
+        switch draggingMode {
+        case .Seek: seekToMousePosition(theEvent)
+        case .Scope: scopeToMousePosition(theEvent)
+        }
+    }
+
+    override func mouseUp(theEvent: NSEvent) {
+        mouseDownLocation = nil
+        scopeRangeOnMouseDown = nil
+
+        switch draggingMode {
+        case .Seek: break
+        case .Scope:
+            onScopeChange?(dragging: false)
+            updateForwardPlaybackEndTime()
+        }
     }
 
     private func seekToMousePosition(theEvent: NSEvent) {
         let p = convertPoint(theEvent.locationInWindow, fromView: nil)
         let time = CMTimeAdd(CMTime(value: Int64(CGFloat(trimRange.duration.value) * p.x / bounds.width), timescale: trimRange.duration.timescale), trimRange.start)
         player.seekToTime(time, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+    }
+
+    private func scopeToMousePosition(theEvent: NSEvent) {
+        guard let mouseDownLocation = mouseDownLocation,
+            let s = scopeRangeOnMouseDown,
+            let minFrameDuration = player.currentItem?.minFrameDuration else { return }
+        let p = convertPoint(theEvent.locationInWindow, fromView: nil)
+
+        let distance = Int32(p.x - mouseDownLocation.x)
+        let start = CMTimeAdd(s.start, CMTimeMultiply(minFrameDuration, distance))
+        let end = CMTimeAdd(s.end, CMTimeMultiply(minFrameDuration, distance))
+
+        if CMTimeRangeContainsTime(trimRange, start) && CMTimeRangeContainsTime(trimRange, end) {
+            scopeRange = CMTimeRange(start: start, end: end)
+        }
     }
 }

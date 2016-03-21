@@ -130,6 +130,7 @@ class LivePhotoSandboxViewController: NSViewController {
         }
 
         overview = MovieOverviewControl(player: self.player, playerItem: item ?? AVPlayerItem(asset: AVAsset()))
+        overview.draggingMode = .Scope
         overview.imageGeneratorTolerance = kCMTimeZero
 
         super.init(nibName: nil, bundle: nil)
@@ -202,6 +203,7 @@ class LivePhotoSandboxViewController: NSViewController {
 
         let trimStart = CMTimeSubtract(posterTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale))
         overview.trimRange = CMTimeRange(start: trimStart, duration: CMTime(seconds: livePhotoDuration * 2, preferredTimescale: posterTime.timescale))
+        overview.onScopeChange = {[weak self] dragging in self?.onScopeChange(dragging)}
         updateScope()
     }
 
@@ -221,6 +223,17 @@ class LivePhotoSandboxViewController: NSViewController {
         endTime = CMTimeAdd(endTime, minFrameDuration)
         updateImages()
         updatePlayButton()
+    }
+
+    func onScopeChange(dragging: Bool) {
+        guard let s = overview.scopeRange?.start,
+            let e = overview.scopeRange?.end else { return }
+        startTime = s
+        endTime = e
+
+        if !dragging {
+            updateImages()
+        }
     }
 
     @objc private func play() {
