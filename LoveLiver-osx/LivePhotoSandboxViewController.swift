@@ -13,6 +13,17 @@ import NorthLayout
 import Ikemen
 
 
+private func label() -> NSTextField {
+    return NSTextField() ※ { tf in
+        tf.bezeled = false
+        tf.editable = false
+        tf.drawsBackground = false
+        tf.textColor = NSColor.grayColor()
+        tf.font = NSFont.monospacedDigitSystemFontOfSize(12, weight: NSFontWeightRegular)
+    }
+}
+
+
 class LivePhotoSandboxViewController: NSViewController {
     private let player: AVPlayer
     private let playerView: AVPlayerView = AVPlayerView() ※ { v in
@@ -21,6 +32,22 @@ class LivePhotoSandboxViewController: NSViewController {
 
     private let startFrameView = NSImageView()
     private let endFrameView = NSImageView()
+    private let imageGenerator: AVAssetImageGenerator
+    private func updateImages() {
+        imageGenerator.cancelAllCGImageGeneration()
+        imageGenerator.generateCGImagesAsynchronouslyForTimes([startTime, endTime].map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) in
+            guard let cgImage = cgImage where result == .Succeeded else { return }
+
+            dispatch_async(dispatch_get_main_queue()) {
+                if requestedTime == self.startTime {
+                    self.startFrameView.image = NSImage(CGImage: cgImage, size: NSZeroSize)
+                }
+                if requestedTime == self.endTime {
+                    self.endFrameView.image = NSImage(CGImage: cgImage, size: NSZeroSize)
+                }
+            }
+        }
+    }
 
     private lazy var playButton: NSButton = NSButton() ※ { b in
         b.setButtonType(.MomentaryLightButton)
@@ -39,21 +66,36 @@ class LivePhotoSandboxViewController: NSViewController {
 
     var startTime: CMTime { didSet { updateLabels() } }
     var posterTime: CMTime { didSet { updateLabels() } }
-    var endTime: CMTime { didSet { updateLabels() } }
-    private lazy var startLabel: NSTextField = NSTextField() ※ self.label
-    private lazy var posterLabel: NSTextField = NSTextField() ※ self.label
-    private lazy var endLabel: NSTextField = NSTextField() ※ self.label
-    private func label(tf: NSTextField) {
-        tf.bezeled = false
-        tf.editable = false
-        tf.drawsBackground = false
-        tf.textColor = NSColor.grayColor()
-        tf.font = NSFont.monospacedDigitSystemFontOfSize(12, weight: NSFontWeightRegular)
+    var endTime: CMTime {
+        didSet {
+            updateLabels()
+            player.currentItem?.forwardPlaybackEndTime = endTime
+        }
     }
+    private let startLabel = label()
+    private let beforePosterLabel = label()
+    private let posterLabel = label()
+    private let afterPosterLabel = label()
+    private let endLabel = label()
     private func updateLabels() {
         startLabel.stringValue = startTime.stringInmmssSS
+        beforePosterLabel.stringValue = " ~ \(CMTimeSubtract(posterTime, startTime).stringInsSS) ~ "
         posterLabel.stringValue = posterTime.stringInmmssSS
+        afterPosterLabel.stringValue = " ~ \(CMTimeSubtract(endTime, posterTime).stringInsSS) ~ "
         endLabel.stringValue = endTime.stringInmmssSS
+    }
+    private lazy var startMinusButton: NSButton = NSButton() ※ self.button ※ { b in
+        b.title = "←"
+        b.action = "startMinus"
+    }
+    private lazy var endPlusButton: NSButton = NSButton() ※ self.button ※ { b in
+        b.title = "→"
+        b.action = "endPlus"
+    }
+    private func button(b: NSButton) {
+        b.setButtonType(.MomentaryLightButton)
+        b.bezelStyle = .RegularSquareBezelStyle
+        b.target = self
     }
 
     init!(player: AVPlayer) {
@@ -69,6 +111,12 @@ class LivePhotoSandboxViewController: NSViewController {
 
         self.player = item.map {AVPlayer(playerItem: $0)} ?? player
         item?.forwardPlaybackEndTime = endTime
+
+        imageGenerator = AVAssetImageGenerator(asset: asset ?? AVAsset()) ※ { g -> Void in
+            g.requestedTimeToleranceBefore = kCMTimeZero
+            g.requestedTimeToleranceAfter = kCMTimeZero
+            g.maximumSize = CGSize(width: 128 * 2, height: 128 * 2)
+        }
 
         super.init(nibName: nil, bundle: nil)
         guard let _ = item else { return nil }
@@ -98,37 +146,57 @@ class LivePhotoSandboxViewController: NSViewController {
             "play": playButton,
             "startFrame": startFrameView,
             "startLabel": startLabel,
+            "startMinus": startMinusButton,
+            "beforePosterLabel": beforePosterLabel,
             "posterLabel": posterLabel,
+            "afterPosterLabel": afterPosterLabel,
             "endFrame": endFrameView,
             "endLabel": endLabel,
-            "spacerL": NSView(),
-            "spacerR": NSView(),
+            "endPlus": endPlusButton,
+            "spacerLL": NSView(),
+            "spacerLR": NSView(),
+            "spacerRL": NSView(),
+            "spacerRR": NSView(),
             ])
         autolayout("H:|-p-[player(>=300)]-p-|")
         autolayout("H:|-p-[startFrame]-(>=p)-[endFrame(==startFrame)]-p-|")
-        autolayout("H:|-p-[startLabel][spacerL][posterLabel][spacerR(==spacerL)][endLabel]-p-|")
+        autolayout("H:|-p-[startLabel][spacerLL][beforePosterLabel][spacerLR(==spacerLL)][posterLabel][spacerRL(==spacerLL)][afterPosterLabel][spacerRR(==spacerLL)][endLabel]-p-|")
         autolayout("H:|-p-[play]-p-|")
+        autolayout("H:|-p-[startMinus]-(>=p)-[endPlus]-p-|")
         autolayout("V:|-p-[player(>=300)]")
-        autolayout("V:[player]-p-[play]-(>=0)-[posterLabel]-p-|")
-        autolayout("V:[player]-p-[startFrame(==128)][startLabel]-p-|")
-        autolayout("V:[player]-p-[endFrame(==startFrame)][endLabel]-p-|")
+        autolayout("V:[player]-p-[play(==startFrame)][posterLabel]")
+        autolayout("V:[player]-p-[startFrame(==128)][startLabel][startMinus]-p-|")
+        autolayout("V:[startFrame][beforePosterLabel]")
+        autolayout("V:[startFrame][afterPosterLabel]")
+        autolayout("V:[player]-p-[endFrame(==startFrame)][endLabel][endPlus]-p-|")
 
         if let videoSize = player.currentItem?.naturalSize {
             playerView.addConstraint(NSLayoutConstraint(item: playerView, attribute: .Height, relatedBy: .Equal,
                 toItem: playerView, attribute: .Width, multiplier: videoSize.height / videoSize.width, constant: 0))
-        }
 
-        if  let asset = player.currentItem?.asset,
-            let imageGenerator = AVAssetImageGenerator(asset: asset) as AVAssetImageGenerator?,
-            let startImage = imageGenerator.copyImage(at: startTime),
-            let endImage = imageGenerator.copyImage(at: endTime) {
-                startFrameView.image = startImage
-                endFrameView.image = endImage
-
-                startFrameView.addConstraint(NSLayoutConstraint(item: startFrameView, attribute: .Width, relatedBy: .Equal, toItem: startFrameView, attribute: .Height, multiplier: startImage.size.width / startImage.size.height, constant: 0))
+            startFrameView.addConstraint(NSLayoutConstraint(item: startFrameView, attribute: .Width, relatedBy: .Equal, toItem: startFrameView, attribute: .Height, multiplier: videoSize.width / videoSize.height, constant: 0))
         }
 
         updateLabels()
+        updateImages()
+    }
+
+    @objc private func startMinus() {
+        guard let item = player.currentItem,
+            let minFrameDuration = item.minFrameDuration else { return }
+        startTime = CMTimeSubtract(startTime, minFrameDuration)
+        endTime = CMTimeSubtract(endTime, minFrameDuration)
+        updateImages()
+        updatePlayButton()
+    }
+
+    @objc private func endPlus() {
+        guard let item = player.currentItem,
+            let minFrameDuration = item.minFrameDuration else { return }
+        startTime = CMTimeAdd(startTime, minFrameDuration)
+        endTime = CMTimeAdd(endTime, minFrameDuration)
+        updateImages()
+        updatePlayButton()
     }
 
     @objc private func play() {

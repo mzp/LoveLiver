@@ -18,6 +18,11 @@ extension CMTime {
         return (minutes, seconds, milliseconds)
     }
 
+    var stringInsSS: String {
+        let (minutes, seconds, milliseconds) = msS
+        return String(format: "%d.%02d", minutes * 60 + seconds, milliseconds)
+    }
+
     var stringInmmssSS: String {
         let (minutes, seconds, milliseconds) = msS
         return String(format: "%02d:%02d.%02d", minutes, seconds, milliseconds)
@@ -41,5 +46,9 @@ extension AVAssetImageGenerator {
 extension AVPlayerItem {
     var naturalSize: CGSize? {
         return asset.tracksWithMediaType(AVMediaTypeVideo).first?.naturalSize
+    }
+
+    var minFrameDuration: CMTime? {
+        return asset.tracksWithMediaType(AVMediaTypeVideo).first?.minFrameDuration
     }
 }
