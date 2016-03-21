@@ -14,8 +14,8 @@ import NorthLayout
 class MovieOverviewViewController: NSViewController {
     private let overview: MovieOverviewControl
     
-    init(player: AVPlayer) {
-        self.overview = MovieOverviewControl(player: player)
+    init(player: AVPlayer, playerItem: AVPlayerItem) {
+        self.overview = MovieOverviewControl(player: player, playerItem: playerItem)
         super.init(nibName: nil, bundle: nil)!
     }
 

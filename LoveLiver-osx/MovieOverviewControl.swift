@@ -40,16 +40,27 @@ class MovieOverviewControl: NSView {
         didSet { setNeedsDisplayInRect(bounds) }
     }
     var thumbnails = [NSImage]()
+    var imageGeneratorTolerance = CMTime(seconds: 300, preferredTimescale: 600)
 
-    var startTime: CMTime? { didSet { reload() } }
-    var endTime: CMTime? { didSet { reload() } }
-    var scopedDuration: CMTime {
-        guard let item = player.currentItem else { return kCMTimeZero }
-        return CMTimeSubtract(endTime ?? item.duration, startTime ?? kCMTimeZero)
+    // overview control supports timmed playback and scope edit
+    var trimRange: CMTimeRange { didSet { reload() } } // show overview only within trimRange
+    var scopeRange: CMTimeRange? { // if non-nil, shows scope control
+        didSet { updateScope() }
+    }
+    private lazy var scopeMaskLeftView: NSView = NSView(frame: NSZeroRect) ※ { v in
+        v.wantsLayer = true
+        v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).CGColor
+        v.hidden = true
+    }
+    private lazy var scopeMaskRightView: NSView = NSView(frame: NSZeroRect) ※ { v in
+        v.wantsLayer = true
+        v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).CGColor
+        v.hidden = true
     }
 
-    init(player: AVPlayer) {
+    init(player: AVPlayer, playerItem: AVPlayerItem) {
         self.player = player
+        self.trimRange = CMTimeRange(start: kCMTimeZero, duration: playerItem.duration)
         
         super.init(frame: NSZeroRect)
 
@@ -61,6 +72,17 @@ class MovieOverviewControl: NSView {
 
         setContentCompressionResistancePriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
         setContentHuggingPriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
+
+        // subviews ordering
+        addSubview(scopeMaskLeftView)
+        addSubview(scopeMaskRightView)
+        sortSubviewsUsingFunction({ (v1, v2, context) -> NSComparisonResult in
+            let s = Unmanaged<MovieOverviewControl>.fromOpaque(COpaquePointer(context)).takeUnretainedValue()
+            switch (v1, v2) {
+            case (s.currentTimeLabel, _): return .OrderedDescending
+            default: return .OrderedSame
+            }
+            }, context: UnsafeMutablePointer<Void>(Unmanaged.passUnretained(self).toOpaque()))
 
         observePlayer()
         updateCurrentTime()
@@ -89,13 +111,15 @@ class MovieOverviewControl: NSView {
         let pageSize = NSSize(width: bounds.height / videoSize.height * videoSize.width, height: bounds.height)
         numberOfPages = UInt(ceil(bounds.width / pageSize.width))
         let times: [CMTime] = (0..<numberOfPages).map { i in
-            CMTimeAdd(startTime ?? kCMTimeZero, CMTime(value: scopedDuration.value * Int64(i) / Int64(numberOfPages), timescale: scopedDuration.timescale))
+            CMTimeAdd(trimRange.start, CMTime(value: trimRange.duration.value * Int64(i) / Int64(numberOfPages), timescale: trimRange.duration.timescale))
         }
 
         // generate thumbnails for each page in background
         let generator = AVAssetImageGenerator(asset: item.asset) ※ {
             let scale = window?.backingScaleFactor ?? 1
             $0.maximumSize = CGSize(width: pageSize.width * scale, height: pageSize.height * scale)
+            $0.requestedTimeToleranceBefore = imageGeneratorTolerance
+            $0.requestedTimeToleranceAfter = imageGeneratorTolerance
         }
         imageGenerator = generator
         generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
@@ -133,14 +157,36 @@ class MovieOverviewControl: NSView {
 
     private func updateCurrentTime() {
         if let time = currentTime {
-            let p = CGFloat(CMTimeSubtract(time, startTime ?? kCMTimeZero).convertScale(scopedDuration.timescale, method: CMTimeRoundingMethod.Default).value)
-                / CGFloat(scopedDuration.value)
+            let p = CGFloat(CMTimeSubtract(time, trimRange.start).convertScale(trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
+                / CGFloat(trimRange.duration.value)
             currentTimeBar.hidden = false
             currentTimeBar.frame = NSRect(x: p * bounds.width, y: 0, width: 1, height: bounds.height)
             currentTimeLabel.stringValue = time.stringInmmssSS
         } else {
             currentTimeBar.hidden = true
             currentTimeLabel.stringValue = "--:--.--"
+        }
+    }
+
+    private func updateScope() {
+        if let s = scopeRange {
+            let startPercent = CGFloat(CMTimeSubtract(s.start, trimRange.start).convertScale(trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
+                / CGFloat(trimRange.duration.value)
+            let endPercent = CGFloat(CMTimeSubtract(s.end, trimRange.start).convertScale(trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
+                / CGFloat(trimRange.duration.value)
+
+            scopeMaskLeftView.hidden = false
+            scopeMaskRightView.hidden = false
+
+            scopeMaskLeftView.frame = NSRect(x: 0, y: 0, width: startPercent * bounds.width, height: bounds.height)
+            scopeMaskRightView.frame = NSRect(x: endPercent * bounds.width, y: 0, width: bounds.width - endPercent * bounds.width, height: bounds.height)
+
+            player.currentItem?.forwardPlaybackEndTime = s.end
+        } else {
+            scopeMaskLeftView.hidden = true
+            scopeMaskRightView.hidden = true
+
+            player.currentItem?.forwardPlaybackEndTime = trimRange.end
         }
     }
 
@@ -166,7 +212,7 @@ class MovieOverviewControl: NSView {
 
     private func seekToMousePosition(theEvent: NSEvent) {
         let p = convertPoint(theEvent.locationInWindow, fromView: nil)
-        let time = CMTimeAdd(CMTime(value: Int64(CGFloat(scopedDuration.value) * p.x / bounds.width), timescale: scopedDuration.timescale), startTime ?? kCMTimeZero)
+        let time = CMTimeAdd(CMTime(value: Int64(CGFloat(trimRange.duration.value) * p.x / bounds.width), timescale: trimRange.duration.timescale), trimRange.start)
         player.seekToTime(time, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
     }
 }

@@ -54,7 +54,7 @@ class MovieDocument: NSDocument, NSWindowDelegate {
     }
 
     private func movieDidLoad(videoSize: CGSize) {
-        overviewVC = MovieOverviewViewController(player: player!)
+        overviewVC = MovieOverviewViewController(player: player!, playerItem: playerItem!)
         overviewWindow = NSWindow(contentViewController: overviewVC!) ※ { w in
             w.delegate = self
             w.styleMask = NSResizableWindowMask

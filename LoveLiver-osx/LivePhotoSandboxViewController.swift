@@ -13,6 +13,9 @@ import NorthLayout
 import Ikemen
 
 
+private let livePhotoDuration: NSTimeInterval = 3
+
+
 private func label() -> NSTextField {
     return NSTextField() ※ { tf in
         tf.bezeled = false
@@ -68,15 +71,14 @@ class LivePhotoSandboxViewController: NSViewController {
     var startTime: CMTime {
         didSet {
             updateLabels()
-            overview.startTime = startTime
+            updateScope()
         }
     }
     var posterTime: CMTime { didSet { updateLabels() } }
     var endTime: CMTime {
         didSet {
             updateLabels()
-            player.currentItem?.forwardPlaybackEndTime = endTime
-            overview.endTime = endTime
+            updateScope()
         }
     }
     private let startLabel = label()
@@ -104,28 +106,31 @@ class LivePhotoSandboxViewController: NSViewController {
         b.bezelStyle = .RegularSquareBezelStyle
         b.target = self
     }
+    private func updateScope() {
+        overview.scopeRange = CMTimeRange(start: startTime, end: endTime)
+    }
 
     init!(player: AVPlayer) {
+        // use guard let and return nil with Swift 2.2
         let asset = player.currentItem?.asset
         let item = asset.map {AVPlayerItem(asset: $0)}
 
         posterTime = player.currentTime()
         let duration = item?.duration ?? kCMTimeZero
-        let livePhotoDuration: NSTimeInterval = 3
         let offset = CMTime(seconds: livePhotoDuration / 2, preferredTimescale: posterTime.timescale)
         startTime = CMTimeMaximum(kCMTimeZero, CMTimeSubtract(posterTime, offset))
         endTime = CMTimeMinimum(CMTimeAdd(posterTime, offset), duration)
 
         self.player = item.map {AVPlayer(playerItem: $0)} ?? player
-        item?.forwardPlaybackEndTime = endTime
-
-        overview = MovieOverviewControl(player: self.player)
 
         imageGenerator = AVAssetImageGenerator(asset: asset ?? AVAsset()) ※ { g -> Void in
             g.requestedTimeToleranceBefore = kCMTimeZero
             g.requestedTimeToleranceAfter = kCMTimeZero
             g.maximumSize = CGSize(width: 128 * 2, height: 128 * 2)
         }
+
+        overview = MovieOverviewControl(player: self.player, playerItem: item ?? AVPlayerItem(asset: AVAsset()))
+        overview.imageGeneratorTolerance = kCMTimeZero
 
         super.init(nibName: nil, bundle: nil)
         guard let _ = item else { return nil }
@@ -195,8 +200,9 @@ class LivePhotoSandboxViewController: NSViewController {
     override func viewDidLayout() {
         super.viewDidLayout()
 
-        overview.startTime = startTime
-        overview.endTime = endTime
+        let trimStart = CMTimeSubtract(posterTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale))
+        overview.trimRange = CMTimeRange(start: trimStart, duration: CMTime(seconds: livePhotoDuration * 2, preferredTimescale: posterTime.timescale))
+        updateScope()
     }
 
     @objc private func startMinus() {
