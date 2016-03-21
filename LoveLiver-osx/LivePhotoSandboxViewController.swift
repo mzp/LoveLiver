@@ -53,21 +53,6 @@ class LivePhotoSandboxViewController: NSViewController {
         }
     }
 
-    private lazy var playButton: NSButton = NSButton() ※ { b in
-        b.setButtonType(.MomentaryLightButton)
-        b.bezelStyle = .CircularBezelStyle
-        b.target = self
-    }
-    private func updatePlayButton() {
-        let playing = (player.rate != 0)
-        playButton.title = playing ? "■" : "▶"
-        playButton.action = playing ? "pause" : "play"
-
-        if !playing {
-            player.seekToTime(posterTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
-        }
-    }
-
     var startTime: CMTime {
         didSet {
             updateLabels()
@@ -141,7 +126,6 @@ class LivePhotoSandboxViewController: NSViewController {
         self.playerView.player = self.player
 
         self.player.addObserver(self, forKeyPath: "rate", options: [], context: nil)
-        updatePlayButton()
         play()
     }
 
@@ -159,7 +143,6 @@ class LivePhotoSandboxViewController: NSViewController {
         let autolayout = view.northLayoutFormat(["p": 8], [
             "player": playerView,
             "overview": overview,
-            "play": playButton,
             "startFrame": startFrameView,
             "startLabel": startLabel,
             "startMinus": startMinusButton,
@@ -177,13 +160,13 @@ class LivePhotoSandboxViewController: NSViewController {
         autolayout("H:|-p-[player(>=300)]-p-|")
         autolayout("H:|-p-[startFrame]-(>=p)-[endFrame(==startFrame)]-p-|")
         autolayout("H:|-p-[startLabel][spacerLL][beforePosterLabel][spacerLR(==spacerLL)][posterLabel][spacerRL(==spacerLL)][afterPosterLabel][spacerRR(==spacerLL)][endLabel]-p-|")
-        autolayout("H:|-p-[play]-p-|")
         autolayout("H:|-p-[startMinus]-(>=p)-[endPlus]-p-|")
         autolayout("H:|-p-[overview]-p-|")
         autolayout("V:|-p-[player(>=300)]")
-        autolayout("V:[player][overview(==64)]-p-[play(==startFrame)][posterLabel]")
+        autolayout("V:[player][overview(==64)]")
         autolayout("V:[overview]-p-[startFrame(==128)][startLabel][startMinus]-p-|")
         autolayout("V:[startFrame][beforePosterLabel]")
+        autolayout("V:[startFrame][posterLabel]")
         autolayout("V:[startFrame][afterPosterLabel]")
         autolayout("V:[overview]-p-[endFrame(==startFrame)][endLabel][endPlus]-p-|")
 
@@ -205,6 +188,10 @@ class LivePhotoSandboxViewController: NSViewController {
         overview.trimRange = CMTimeRange(start: trimStart, duration: CMTime(seconds: livePhotoDuration * 2, preferredTimescale: posterTime.timescale))
         overview.onScopeChange = {[weak self] dragging in self?.onScopeChange(dragging)}
         updateScope()
+
+        // hook playerView click
+        let playerViewClickGesture = NSClickGestureRecognizer(target: self, action: "playOrPause")
+        playerView.addGestureRecognizer(playerViewClickGesture)
     }
 
     @objc private func startMinus() {
@@ -213,7 +200,6 @@ class LivePhotoSandboxViewController: NSViewController {
         startTime = CMTimeSubtract(startTime, minFrameDuration)
         endTime = CMTimeSubtract(endTime, minFrameDuration)
         updateImages()
-        updatePlayButton()
     }
 
     @objc private func endPlus() {
@@ -222,7 +208,6 @@ class LivePhotoSandboxViewController: NSViewController {
         startTime = CMTimeAdd(startTime, minFrameDuration)
         endTime = CMTimeAdd(endTime, minFrameDuration)
         updateImages()
-        updatePlayButton()
     }
 
     func onScopeChange(dragging: Bool) {
@@ -245,10 +230,21 @@ class LivePhotoSandboxViewController: NSViewController {
         player.pause()
     }
 
+    @objc private func playOrPause() {
+        if player.rate == 0 {
+            play()
+        } else {
+            pause()
+        }
+    }
+
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         switch (object, keyPath) {
         case (is AVPlayer, _):
-            updatePlayButton()
+            let stopped = (player.rate == 0)
+            if stopped {
+                player.seekToTime(posterTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+            }
             break
         default:
             super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
