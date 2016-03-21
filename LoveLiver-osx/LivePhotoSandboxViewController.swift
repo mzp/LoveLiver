@@ -78,19 +78,6 @@ class LivePhotoSandboxViewController: NSViewController {
         afterPosterLabel.stringValue = " ~ \(CMTimeSubtract(endTime, posterTime).stringInsSS) ~ "
         endLabel.stringValue = endTime.stringInmmssSS
     }
-    private lazy var startMinusButton: NSButton = NSButton() ※ self.button ※ { b in
-        b.title = "←"
-        b.action = "startMinus"
-    }
-    private lazy var endPlusButton: NSButton = NSButton() ※ self.button ※ { b in
-        b.title = "→"
-        b.action = "endPlus"
-    }
-    private func button(b: NSButton) {
-        b.setButtonType(.MomentaryLightButton)
-        b.bezelStyle = .RegularSquareBezelStyle
-        b.target = self
-    }
     private func updateScope() {
         overview.scopeRange = CMTimeRange(start: startTime, end: endTime)
     }
@@ -145,13 +132,11 @@ class LivePhotoSandboxViewController: NSViewController {
             "overview": overview,
             "startFrame": startFrameView,
             "startLabel": startLabel,
-            "startMinus": startMinusButton,
             "beforePosterLabel": beforePosterLabel,
             "posterLabel": posterLabel,
             "afterPosterLabel": afterPosterLabel,
             "endFrame": endFrameView,
             "endLabel": endLabel,
-            "endPlus": endPlusButton,
             "spacerLL": NSView(),
             "spacerLR": NSView(),
             "spacerRL": NSView(),
@@ -160,15 +145,14 @@ class LivePhotoSandboxViewController: NSViewController {
         autolayout("H:|-p-[player(>=300)]-p-|")
         autolayout("H:|-p-[startFrame]-(>=p)-[endFrame(==startFrame)]-p-|")
         autolayout("H:|-p-[startLabel][spacerLL][beforePosterLabel][spacerLR(==spacerLL)][posterLabel][spacerRL(==spacerLL)][afterPosterLabel][spacerRR(==spacerLL)][endLabel]-p-|")
-        autolayout("H:|-p-[startMinus]-(>=p)-[endPlus]-p-|")
         autolayout("H:|-p-[overview]-p-|")
         autolayout("V:|-p-[player(>=300)]")
         autolayout("V:[player][overview(==64)]")
-        autolayout("V:[overview]-p-[startFrame(==128)][startLabel][startMinus]-p-|")
+        autolayout("V:[overview]-p-[startFrame(==128)][startLabel]-p-|")
         autolayout("V:[startFrame][beforePosterLabel]")
         autolayout("V:[startFrame][posterLabel]")
         autolayout("V:[startFrame][afterPosterLabel]")
-        autolayout("V:[overview]-p-[endFrame(==startFrame)][endLabel][endPlus]-p-|")
+        autolayout("V:[overview]-p-[endFrame(==startFrame)][endLabel]-p-|")
 
         if let videoSize = player.currentItem?.naturalSize {
             playerView.addConstraint(NSLayoutConstraint(item: playerView, attribute: .Height, relatedBy: .Equal,
@@ -192,22 +176,6 @@ class LivePhotoSandboxViewController: NSViewController {
         // hook playerView click
         let playerViewClickGesture = NSClickGestureRecognizer(target: self, action: "playOrPause")
         playerView.addGestureRecognizer(playerViewClickGesture)
-    }
-
-    @objc private func startMinus() {
-        guard let item = player.currentItem,
-            let minFrameDuration = item.minFrameDuration else { return }
-        startTime = CMTimeSubtract(startTime, minFrameDuration)
-        endTime = CMTimeSubtract(endTime, minFrameDuration)
-        updateImages()
-    }
-
-    @objc private func endPlus() {
-        guard let item = player.currentItem,
-            let minFrameDuration = item.minFrameDuration else { return }
-        startTime = CMTimeAdd(startTime, minFrameDuration)
-        endTime = CMTimeAdd(endTime, minFrameDuration)
-        updateImages()
     }
 
     func onScopeChange(dragging: Bool) {
