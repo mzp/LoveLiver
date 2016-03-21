@@ -41,6 +41,13 @@ class MovieOverviewControl: NSView {
     }
     var thumbnails = [NSImage]()
 
+    var startTime: CMTime? { didSet { reload() } }
+    var endTime: CMTime? { didSet { reload() } }
+    var scopedDuration: CMTime {
+        guard let item = player.currentItem else { return kCMTimeZero }
+        return CMTimeSubtract(endTime ?? item.duration, startTime ?? kCMTimeZero)
+    }
+
     init(player: AVPlayer) {
         self.player = player
         
@@ -81,9 +88,8 @@ class MovieOverviewControl: NSView {
         // each page preserves aspect ratio of video and varies number of pages so that fill self.bounds.width
         let pageSize = NSSize(width: bounds.height / videoSize.height * videoSize.width, height: bounds.height)
         numberOfPages = UInt(ceil(bounds.width / pageSize.width))
-        let duration = item.duration
         let times: [CMTime] = (0..<numberOfPages).map { i in
-            CMTime(value: duration.value * Int64(i) / Int64(numberOfPages), timescale: duration.timescale)
+            CMTimeAdd(startTime ?? kCMTimeZero, CMTime(value: scopedDuration.value * Int64(i) / Int64(numberOfPages), timescale: scopedDuration.timescale))
         }
 
         // generate thumbnails for each page in background
@@ -126,14 +132,12 @@ class MovieOverviewControl: NSView {
     }
 
     private func updateCurrentTime() {
-        if  let item = player.currentItem,
-            let time = currentTime {
-                let duration = item.duration
-                let p = CGFloat(time.convertScale(duration.timescale, method: CMTimeRoundingMethod.Default).value)
-                    / CGFloat(duration.value)
-                currentTimeBar.hidden = false
-                currentTimeBar.frame = NSRect(x: p * bounds.width, y: 0, width: 1, height: bounds.height)
-                currentTimeLabel.stringValue = time.stringInmmssSS
+        if let time = currentTime {
+            let p = CGFloat(CMTimeSubtract(time, startTime ?? kCMTimeZero).convertScale(scopedDuration.timescale, method: CMTimeRoundingMethod.Default).value)
+                / CGFloat(scopedDuration.value)
+            currentTimeBar.hidden = false
+            currentTimeBar.frame = NSRect(x: p * bounds.width, y: 0, width: 1, height: bounds.height)
+            currentTimeLabel.stringValue = time.stringInmmssSS
         } else {
             currentTimeBar.hidden = true
             currentTimeLabel.stringValue = "--:--.--"
@@ -161,11 +165,8 @@ class MovieOverviewControl: NSView {
     }
 
     private func seekToMousePosition(theEvent: NSEvent) {
-        guard let item = player.currentItem else { return }
-        let duration = item.duration
-
         let p = convertPoint(theEvent.locationInWindow, fromView: nil)
-        let time = CMTime(value: Int64(CGFloat(duration.value) * p.x / bounds.width), timescale: duration.timescale)
+        let time = CMTimeAdd(CMTime(value: Int64(CGFloat(scopedDuration.value) * p.x / bounds.width), timescale: scopedDuration.timescale), startTime ?? kCMTimeZero)
         player.seekToTime(time, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
     }
 }

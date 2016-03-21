@@ -29,6 +29,7 @@ class LivePhotoSandboxViewController: NSViewController {
     private let playerView: AVPlayerView = AVPlayerView() ※ { v in
         v.controlsStyle = .None
     }
+    private let overview: MovieOverviewControl
 
     private let startFrameView = NSImageView()
     private let endFrameView = NSImageView()
@@ -64,12 +65,18 @@ class LivePhotoSandboxViewController: NSViewController {
         }
     }
 
-    var startTime: CMTime { didSet { updateLabels() } }
+    var startTime: CMTime {
+        didSet {
+            updateLabels()
+            overview.startTime = startTime
+        }
+    }
     var posterTime: CMTime { didSet { updateLabels() } }
     var endTime: CMTime {
         didSet {
             updateLabels()
             player.currentItem?.forwardPlaybackEndTime = endTime
+            overview.endTime = endTime
         }
     }
     private let startLabel = label()
@@ -112,6 +119,8 @@ class LivePhotoSandboxViewController: NSViewController {
         self.player = item.map {AVPlayer(playerItem: $0)} ?? player
         item?.forwardPlaybackEndTime = endTime
 
+        overview = MovieOverviewControl(player: self.player)
+
         imageGenerator = AVAssetImageGenerator(asset: asset ?? AVAsset()) ※ { g -> Void in
             g.requestedTimeToleranceBefore = kCMTimeZero
             g.requestedTimeToleranceAfter = kCMTimeZero
@@ -143,6 +152,7 @@ class LivePhotoSandboxViewController: NSViewController {
 
         let autolayout = view.northLayoutFormat(["p": 8], [
             "player": playerView,
+            "overview": overview,
             "play": playButton,
             "startFrame": startFrameView,
             "startLabel": startLabel,
@@ -163,12 +173,13 @@ class LivePhotoSandboxViewController: NSViewController {
         autolayout("H:|-p-[startLabel][spacerLL][beforePosterLabel][spacerLR(==spacerLL)][posterLabel][spacerRL(==spacerLL)][afterPosterLabel][spacerRR(==spacerLL)][endLabel]-p-|")
         autolayout("H:|-p-[play]-p-|")
         autolayout("H:|-p-[startMinus]-(>=p)-[endPlus]-p-|")
+        autolayout("H:|-p-[overview]-p-|")
         autolayout("V:|-p-[player(>=300)]")
-        autolayout("V:[player]-p-[play(==startFrame)][posterLabel]")
-        autolayout("V:[player]-p-[startFrame(==128)][startLabel][startMinus]-p-|")
+        autolayout("V:[player][overview(==64)]-p-[play(==startFrame)][posterLabel]")
+        autolayout("V:[overview]-p-[startFrame(==128)][startLabel][startMinus]-p-|")
         autolayout("V:[startFrame][beforePosterLabel]")
         autolayout("V:[startFrame][afterPosterLabel]")
-        autolayout("V:[player]-p-[endFrame(==startFrame)][endLabel][endPlus]-p-|")
+        autolayout("V:[overview]-p-[endFrame(==startFrame)][endLabel][endPlus]-p-|")
 
         if let videoSize = player.currentItem?.naturalSize {
             playerView.addConstraint(NSLayoutConstraint(item: playerView, attribute: .Height, relatedBy: .Equal,
@@ -179,6 +190,13 @@ class LivePhotoSandboxViewController: NSViewController {
 
         updateLabels()
         updateImages()
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        overview.startTime = startTime
+        overview.endTime = endTime
     }
 
     @objc private func startMinus() {
