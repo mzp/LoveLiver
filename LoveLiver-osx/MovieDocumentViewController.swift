@@ -17,6 +17,7 @@ class MovieDocumentViewController: NSViewController {
     private let movieURL: NSURL
     private let player: AVPlayer
     private let playerItem: AVPlayerItem
+    var createLivePhotoAction: (Void -> Void)?
 
     private let playerView: AVPlayerView = AVPlayerView() ※ { v in
         v.controlsStyle = .Floating
@@ -62,14 +63,6 @@ class MovieDocumentViewController: NSViewController {
 
     @objc private func createLivePhotoSandbox() {
         player.pause()
-
-        let livephotoSandboxVC = LivePhotoSandboxViewController(player: player, baseFilename: movieURL.lastPathComponent ?? "unknown")
-        let popover = NSPopover()
-        livephotoSandboxVC.closeAction = {
-            popover.performClose(nil)
-        }
-        popover.behavior = .Semitransient
-        popover.contentViewController = livephotoSandboxVC
-        popover.showRelativeToRect(posterFrameButton.bounds, ofView: posterFrameButton, preferredEdge: NSRectEdge.MinY)
+        createLivePhotoAction?()
     }
 }

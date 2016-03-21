@@ -12,7 +12,7 @@ import NorthLayout
 
 
 class MovieOverviewViewController: NSViewController {
-    private let overview: MovieOverviewControl
+    let overview: MovieOverviewControl
     
     init(player: AVPlayer, playerItem: AVPlayerItem) {
         self.overview = MovieOverviewControl(player: player, playerItem: playerItem)

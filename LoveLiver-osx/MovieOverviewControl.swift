@@ -21,7 +21,7 @@ class MovieOverviewControl: NSView {
     var currentTime: CMTime? {
         didSet { updateCurrentTime() }
     }
-    private lazy var currentTimeBar: NSView = NSView(frame: NSZeroRect) ※ { v in
+    private(set) lazy var currentTimeBar: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
         v.layer?.backgroundColor = NSColor.redColor().CGColor
         self.addSubview(v)

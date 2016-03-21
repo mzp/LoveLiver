@@ -29,6 +29,7 @@ class MovieDocument: NSDocument, NSWindowDelegate {
 
     override func makeWindowControllers() {
         mainVC = MovieDocumentViewController(movieURL: fileURL!, playerItem: playerItem!, player: player!)
+        mainVC?.createLivePhotoAction = {[weak self] in self?.openLivePhotoSandbox()}
         mainWindow = NSWindow(contentViewController: mainVC!) ※ { w in
             w.delegate = self
         }
@@ -65,6 +66,20 @@ class MovieDocument: NSDocument, NSWindowDelegate {
         mainVC?.movieDidLoad(videoSize)
         overviewVC?.movieDidLoad(videoSize)
         repositionOverviewWindow()
+    }
+
+    private func openLivePhotoSandbox() {
+        guard let player = player else { return }
+        guard let overview = overviewVC?.overview else { return }
+
+        let livephotoSandboxVC = LivePhotoSandboxViewController(player: player, baseFilename: fileURL?.lastPathComponent ?? "unknown")
+        let popover = NSPopover()
+        livephotoSandboxVC.closeAction = {
+            popover.performClose(nil)
+        }
+        popover.behavior = .Semitransient
+        popover.contentViewController = livephotoSandboxVC
+        popover.showRelativeToRect(overview.currentTimeBar.frame, ofView: overview, preferredEdge: NSRectEdge.MinY)
     }
 
     func windowDidResize(notification: NSNotification) {
