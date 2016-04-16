@@ -69,8 +69,9 @@ class MovieDocument: NSDocument, NSWindowDelegate {
     }
 
     private func openLivePhotoSandbox() {
-        guard let player = player else { return }
-        guard let overview = overviewVC?.overview else { return }
+        guard let player = player,
+            let overviewContentView = overviewVC?.view,
+            let overview = overviewVC?.overview else { return }
 
         let livephotoSandboxVC = LivePhotoSandboxViewController(player: player, baseFilename: fileURL?.lastPathComponent ?? "unknown")
         let popover = NSPopover()
@@ -79,7 +80,7 @@ class MovieDocument: NSDocument, NSWindowDelegate {
         }
         popover.behavior = .Semitransient
         popover.contentViewController = livephotoSandboxVC
-        popover.showRelativeToRect(overview.currentTimeBar.frame, ofView: overview, preferredEdge: NSRectEdge.MinY)
+        popover.showRelativeToRect(overviewContentView.convertRect(overview.currentTimeBar.frame, fromView: overview), ofView: overviewContentView, preferredEdge: NSRectEdge.MinY)
     }
 
     func windowDidResize(notification: NSNotification) {

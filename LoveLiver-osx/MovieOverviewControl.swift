@@ -53,6 +53,7 @@ class MovieOverviewControl: NSView {
             onScopeChange?(dragging: mouseDownLocation != nil)
         }
     }
+    var shouldUpdateScopeRange: ((newValue: CMTimeRange?) -> Bool)?
     var onScopeChange: ((dragging: Bool) -> Void)?
     private lazy var scopeMaskLeftView: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
@@ -270,9 +271,10 @@ class MovieOverviewControl: NSView {
         let distance = Int32(p.x - mouseDownLocation.x)
         let start = CMTimeAdd(s.start, CMTimeMultiply(minFrameDuration, distance))
         let end = CMTimeAdd(s.end, CMTimeMultiply(minFrameDuration, distance))
+        let newScopeRange = CMTimeRange(start: start, end: end)
 
-        if CMTimeRangeContainsTime(trimRange, start) && CMTimeRangeContainsTime(trimRange, end) {
-            scopeRange = CMTimeRange(start: start, end: end)
+        if shouldUpdateScopeRange?(newValue: newScopeRange) == true {
+            scopeRange = newScopeRange
         }
     }
 }

@@ -101,7 +101,17 @@ class LivePhotoSandboxViewController: NSViewController {
         endLabel.stringValue = endTime.stringInmmssSS
     }
     private func updateScope() {
-        overview.scopeRange = CMTimeRange(start: startTime, end: endTime)
+        let duration = player.currentItem?.duration ?? kCMTimeZero
+
+        if CMTimeMaximum(kCMTimeZero, startTime) == kCMTimeZero {
+            // scope is clipped by zero. underflow scope start by subtracting from end
+            overview.scopeRange = CMTimeRange(start: CMTimeSubtract(endTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale)), end: endTime)
+        } else if CMTimeMinimum(duration, endTime) == duration {
+            // scope is clipped by movie end. overflow scope end by adding to start
+            overview.scopeRange = CMTimeRange(start: startTime, end: CMTimeAdd(startTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale)))
+        } else {
+            overview.scopeRange = CMTimeRange(start: startTime, end: endTime)
+        }
     }
 
     init!(player: AVPlayer, baseFilename: String) {
@@ -109,7 +119,7 @@ class LivePhotoSandboxViewController: NSViewController {
         let item = AVPlayerItem(asset: asset)
 
         self.baseFilename = baseFilename
-        posterTime = player.currentTime()
+        posterTime = CMTimeConvertScale(player.currentTime(), max(600, player.currentTime().timescale), .Default) // timescale = 1 (too inaccurate) when posterTime = 0
         let duration = item.duration
         let offset = CMTime(seconds: livePhotoDuration / 2, preferredTimescale: posterTime.timescale)
         startTime = CMTimeMaximum(kCMTimeZero, CMTimeSubtract(posterTime, offset))
@@ -194,7 +204,13 @@ class LivePhotoSandboxViewController: NSViewController {
         super.viewDidLayout()
 
         let trimStart = CMTimeSubtract(posterTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale))
-        overview.trimRange = CMTimeRange(start: trimStart, duration: CMTime(seconds: livePhotoDuration * 2, preferredTimescale: posterTime.timescale))
+        let trimEnd = CMTimeAdd(posterTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale))
+        overview.trimRange = CMTimeRange(start: trimStart, end: trimEnd)
+        overview.shouldUpdateScopeRange = {[weak self] scopeRange in
+            guard let `self` = self,
+                let scopeRange = scopeRange else { return false }
+            return CMTimeRangeContainsTime(scopeRange, self.posterTime)
+        }
         overview.onScopeChange = {[weak self] dragging in self?.onScopeChange(dragging)}
         updateScope()
 
@@ -206,8 +222,8 @@ class LivePhotoSandboxViewController: NSViewController {
     func onScopeChange(dragging: Bool) {
         guard let s = overview.scopeRange?.start,
             let e = overview.scopeRange?.end else { return }
-        startTime = s
-        endTime = e
+        startTime = CMTimeMaximum(kCMTimeZero, s)
+        endTime = CMTimeMinimum(player.currentItem?.duration ?? kCMTimeZero, e)
 
         if !dragging {
             updateImages()

@@ -34,6 +34,7 @@ class MovieOverviewViewController: NSViewController {
     }
 
     func movieDidLoad(videoSize: CGSize) {
+        overview.currentTime = kCMTimeZero
         overview.reload()
     }
 }
