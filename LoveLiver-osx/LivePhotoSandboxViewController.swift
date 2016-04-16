@@ -34,7 +34,7 @@ class LivePhotoSandboxViewController: NSViewController {
         b.bezelStyle = .RegularSquareBezelStyle
         b.title = "Create Live Photo"
         b.target = self
-        b.action = "export"
+        b.action = #selector(self.export)
     }
     private var exportSession: AVAssetExportSession?
 
@@ -42,7 +42,7 @@ class LivePhotoSandboxViewController: NSViewController {
         b.bezelStyle = .RegularSquareBezelStyle
         b.title = "Close"
         b.target = self
-        b.action = "close"
+        b.action = #selector(self.close)
     }
     var closeAction: (Void -> Void)?
 
@@ -105,31 +105,29 @@ class LivePhotoSandboxViewController: NSViewController {
     }
 
     init!(player: AVPlayer, baseFilename: String) {
-        // use guard let and return nil with Swift 2.2
-        let asset = player.currentItem?.asset
-        let item = asset.map {AVPlayerItem(asset: $0)}
+        guard let asset = player.currentItem?.asset else { return nil }
+        let item = AVPlayerItem(asset: asset)
 
         self.baseFilename = baseFilename
         posterTime = player.currentTime()
-        let duration = item?.duration ?? kCMTimeZero
+        let duration = item.duration
         let offset = CMTime(seconds: livePhotoDuration / 2, preferredTimescale: posterTime.timescale)
         startTime = CMTimeMaximum(kCMTimeZero, CMTimeSubtract(posterTime, offset))
         endTime = CMTimeMinimum(CMTimeAdd(posterTime, offset), duration)
 
-        self.player = item.map {AVPlayer(playerItem: $0)} ?? player
+        self.player = AVPlayer(playerItem: item)
 
-        imageGenerator = AVAssetImageGenerator(asset: asset ?? AVAsset()) ※ { g -> Void in
+        imageGenerator = AVAssetImageGenerator(asset: asset) ※ { g -> Void in
             g.requestedTimeToleranceBefore = kCMTimeZero
             g.requestedTimeToleranceAfter = kCMTimeZero
             g.maximumSize = CGSize(width: 128 * 2, height: 128 * 2)
         }
 
-        overview = MovieOverviewControl(player: self.player, playerItem: item ?? AVPlayerItem(asset: AVAsset()))
+        overview = MovieOverviewControl(player: self.player, playerItem: item)
         overview.draggingMode = .Scope
         overview.imageGeneratorTolerance = kCMTimeZero
 
         super.init(nibName: nil, bundle: nil)
-        guard let _ = item else { return nil }
 
         self.player.volume = player.volume
         self.player.actionAtItemEnd = .Pause
@@ -201,7 +199,7 @@ class LivePhotoSandboxViewController: NSViewController {
         updateScope()
 
         // hook playerView click
-        let playerViewClickGesture = NSClickGestureRecognizer(target: self, action: "playOrPause")
+        let playerViewClickGesture = NSClickGestureRecognizer(target: self, action: #selector(playOrPause))
         playerView.addGestureRecognizer(playerViewClickGesture)
     }
 
@@ -227,7 +225,7 @@ class LivePhotoSandboxViewController: NSViewController {
 
         let assetIdentifier = NSUUID().UUIDString
         let basename = [
-            baseFilename ?? "",
+            baseFilename,
             posterTime.stringInmmmsssSS,
             assetIdentifier].joinWithSeparator("-")
         let tmpImagePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(basename).tiff").path!

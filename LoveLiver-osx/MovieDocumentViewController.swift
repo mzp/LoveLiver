@@ -28,7 +28,7 @@ class MovieDocumentViewController: NSViewController {
         b.setButtonType(.MomentaryLightButton)
         b.bezelStyle = .RoundedBezelStyle
         b.target = self
-        b.action = "createLivePhotoSandbox"
+        b.action = #selector(self.createLivePhotoSandbox)
     }
 
     init!(movieURL: NSURL, playerItem: AVPlayerItem, player: AVPlayer) {
