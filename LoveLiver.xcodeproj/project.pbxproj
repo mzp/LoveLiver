@@ -7,12 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		133DFE291BC8B71100902407 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE281BC8B71100902407 /* main.swift */; };
-		133DFE371BC8C3E000902407 /* CommandLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE331BC8C3E000902407 /* CommandLine.swift */; };
-		133DFE381BC8C3E000902407 /* Option.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE351BC8C3E000902407 /* Option.swift */; };
-		133DFE391BC8C3E000902407 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE361BC8C3E000902407 /* StringExtensions.swift */; };
-		133DFE3B1BC8C69900902407 /* JPEG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3A1BC8C69900902407 /* JPEG.swift */; };
-		133DFE3D1BC8C6EF00902407 /* QuickTimeMov.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */; };
 		C2C41F0CC51A39D97981D73D /* Pods_LoveLiver_osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */; };
 		EA27F5EF1C98426A00C23F40 /* MovieOverviewControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */; };
 		EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379AB81C68DE6D00106AEF /* AppDelegate.swift */; };
@@ -27,25 +21,7 @@
 		EA88135F1C9ED065000CE151 /* MovieOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA88135E1C9ED065000CE151 /* MovieOverviewViewController.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		133DFE231BC8B71100902407 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		133DFE251BC8B71100902407 /* LoveLiver */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoveLiver; sourceTree = BUILT_PRODUCTS_DIR; };
-		133DFE281BC8B71100902407 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		133DFE331BC8C3E000902407 /* CommandLine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommandLine.swift; sourceTree = "<group>"; };
-		133DFE341BC8C3E000902407 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		133DFE351BC8C3E000902407 /* Option.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Option.swift; sourceTree = "<group>"; };
-		133DFE361BC8C3E000902407 /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		133DFE3A1BC8C69900902407 /* JPEG.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JPEG.swift; sourceTree = "<group>"; };
 		133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickTimeMov.swift; sourceTree = "<group>"; };
 		3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LoveLiver_osx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -65,13 +41,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		133DFE221BC8B71100902407 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		EA379AB31C68DE6D00106AEF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -106,7 +75,6 @@
 		133DFE261BC8B71100902407 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				133DFE251BC8B71100902407 /* LoveLiver */,
 				EA379AB61C68DE6D00106AEF /* LoveLiver.app */,
 			);
 			name = Products;
@@ -115,23 +83,10 @@
 		133DFE271BC8B71100902407 /* LoveLiver */ = {
 			isa = PBXGroup;
 			children = (
-				133DFE321BC8C3E000902407 /* CommandLine */,
-				133DFE281BC8B71100902407 /* main.swift */,
 				133DFE3A1BC8C69900902407 /* JPEG.swift */,
 				133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */,
 			);
 			path = LoveLiver;
-			sourceTree = "<group>";
-		};
-		133DFE321BC8C3E000902407 /* CommandLine */ = {
-			isa = PBXGroup;
-			children = (
-				133DFE331BC8C3E000902407 /* CommandLine.swift */,
-				133DFE341BC8C3E000902407 /* Info.plist */,
-				133DFE351BC8C3E000902407 /* Option.swift */,
-				133DFE361BC8C3E000902407 /* StringExtensions.swift */,
-			);
-			path = CommandLine;
 			sourceTree = "<group>";
 		};
 		A5911014E6D1DEA080967902 /* Frameworks */ = {
@@ -162,23 +117,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		133DFE241BC8B71100902407 /* LoveLiver */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 133DFE2C1BC8B71100902407 /* Build configuration list for PBXNativeTarget "LoveLiver" */;
-			buildPhases = (
-				133DFE211BC8B71100902407 /* Sources */,
-				133DFE221BC8B71100902407 /* Frameworks */,
-				133DFE231BC8B71100902407 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = LoveLiver;
-			productName = LoveLiver;
-			productReference = 133DFE251BC8B71100902407 /* LoveLiver */;
-			productType = "com.apple.product-type.tool";
-		};
 		EA379AB51C68DE6D00106AEF /* LoveLiver-osx */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EA379AC21C68DE6D00106AEF /* Build configuration list for PBXNativeTarget "LoveLiver-osx" */;
@@ -209,9 +147,6 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = mzp;
 				TargetAttributes = {
-					133DFE241BC8B71100902407 = {
-						CreatedOnToolsVersion = 7.0.1;
-					};
 					EA379AB51C68DE6D00106AEF = {
 						CreatedOnToolsVersion = 7.2;
 					};
@@ -230,7 +165,6 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				133DFE241BC8B71100902407 /* LoveLiver */,
 				EA379AB51C68DE6D00106AEF /* LoveLiver-osx */,
 			);
 		};
@@ -297,19 +231,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		133DFE211BC8B71100902407 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				133DFE391BC8C3E000902407 /* StringExtensions.swift in Sources */,
-				133DFE3B1BC8C69900902407 /* JPEG.swift in Sources */,
-				133DFE291BC8B71100902407 /* main.swift in Sources */,
-				133DFE381BC8C3E000902407 /* Option.swift in Sources */,
-				133DFE371BC8C3E000902407 /* CommandLine.swift in Sources */,
-				133DFE3D1BC8C6EF00902407 /* QuickTimeMov.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		EA379AB21C68DE6D00106AEF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -418,20 +339,6 @@
 			};
 			name = Release;
 		};
-		133DFE2D1BC8B71100902407 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		133DFE2E1BC8B71100902407 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		EA379AC01C68DE6D00106AEF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DCD5B633553004CEA3DAF5F6 /* Pods-LoveLiver-osx.debug.xcconfig */;
@@ -468,15 +375,6 @@
 			buildConfigurations = (
 				133DFE2A1BC8B71100902407 /* Debug */,
 				133DFE2B1BC8B71100902407 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		133DFE2C1BC8B71100902407 /* Build configuration list for PBXNativeTarget "LoveLiver" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				133DFE2D1BC8B71100902407 /* Debug */,
-				133DFE2E1BC8B71100902407 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
