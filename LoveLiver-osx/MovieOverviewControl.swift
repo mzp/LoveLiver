@@ -10,6 +10,7 @@ import Cocoa
 import AVFoundation
 import Ikemen
 import NorthLayout
+import AVKit
 
 
 private let overviewHeight: CGFloat = 64
@@ -136,18 +137,13 @@ class MovieOverviewControl: NSView {
         // generate thumbnails for each page in background
         let generator = AVAssetImageGenerator(asset: item.asset) ※ {
             let scale = window?.backingScaleFactor ?? 1
-//            $0.maximumSize = CGSize(width: pageSize.width * scale, height: pageSize.height * scale)
+            $0.maximumSize = CGSize(width: pageSize.width * scale, height: pageSize.height * scale)
             $0.requestedTimeToleranceBefore = imageGeneratorTolerance
             $0.requestedTimeToleranceAfter = imageGeneratorTolerance
         }
         imageGenerator = generator
         generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
             guard let cgImage = cgImage where result == .Succeeded else { return }
-            
-            let animeFace = AnimeFace()
-            let faces = (animeFace.detect(cgImage) as! [NSValue]).map {$0.rectValue}
-            let timePercent = CGFloat(actualTime.convertScale(self.trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
-                / CGFloat(self.trimRange.duration.value)
 
             let thumb = NSImage(CGImage: cgImage, size: NSZeroSize)
 
@@ -155,7 +151,27 @@ class MovieOverviewControl: NSView {
                 guard self.imageGenerator === generator else { return } // avoid appending result from outdated requests
                 self.thumbnails.append(thumb)
                 self.setNeedsDisplayInRect(self.bounds)
-                self.faceAnnotationView.faces.append((at: timePercent, size: (faces.first?.width ?? 0) * (faces.first?.height ?? 0)))
+                
+                if UInt(self.thumbnails.count) == self.numberOfPages {
+                    let times2: [CMTime] = (0..<self.numberOfPages*10).map { i in
+                        CMTimeAdd(self.trimRange.start, CMTime(value: self.trimRange.duration.value * Int64(i) / Int64(self.numberOfPages*10), timescale: self.trimRange.duration.timescale))
+                    }
+                    generator.maximumSize = .zero
+                    generator.generateCGImagesAsynchronouslyForTimes(times2.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
+                        guard let cgImage = cgImage where result == .Succeeded else { return }
+                        
+                        let animeFace = AnimeFace()
+                        let faces = (animeFace.detect(cgImage) as! [NSValue]).map {$0.rectValue}
+                        let timePercent = CGFloat(actualTime.convertScale(self.trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
+                            / CGFloat(self.trimRange.duration.value)
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            let area = abs(faces.first?.width ?? 0) * abs(faces.first?.height ?? 0)
+                            guard area > 0 else { return }
+                            self.faceAnnotationView.faces.append((at: timePercent, size: area))
+                        }
+                    }
+                }
             }
         }
     }

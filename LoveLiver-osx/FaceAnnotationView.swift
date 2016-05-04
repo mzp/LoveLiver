@@ -32,6 +32,7 @@ class FaceAnnotationView: NSView {
             let s = faces.filter({abs($0.at * bounds.width - CGFloat(x)) <= 4}).maxElement {$0.size < $1.size}?.size ?? 0
             path.lineToPoint(NSPoint(x: CGFloat(x), y: bounds.height * (s / maxSize)))
         }
+        path.lineToPoint(NSPoint(x: bounds.width, y: 0))
         
         NSColor.redColor().colorWithAlphaComponent(0.75).set()
         path.fill()

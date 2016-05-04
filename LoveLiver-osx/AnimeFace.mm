@@ -25,7 +25,7 @@
 
     CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), image);
     CGContextRelease(contextRef);
-    CGColorSpaceRelease(colorSpace);
+//    CGColorSpaceRelease(colorSpace);
 
     return cvMat;
 }
