@@ -87,18 +87,6 @@ class MovieOverviewControl: NSView {
         autolayout("H:|[faceAnnotation]|")
         autolayout("V:[faceAnnotation(==25)]|")
         autolayout("V:[currentTime]|")
-        
-        // TODO: remove dummy values
-        faceAnnotationView.faces = [
-            (0.5, 3),
-            (0.51, 2),
-            (0.52, 2),
-            (0.53, 1),
-            (0.7, 3),
-            (0.71, 2),
-            (0.72, 2),
-            (0.73, 1),
-        ]
 
         setContentCompressionResistancePriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
         setContentHuggingPriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
@@ -130,6 +118,7 @@ class MovieOverviewControl: NSView {
         imageGenerator?.cancelAllCGImageGeneration()
         imageGenerator = nil
         thumbnails.removeAll()
+        faceAnnotationView.faces.removeAll()
 
         guard let item = player.currentItem,
             let videoSize = item.naturalSize else {
@@ -147,13 +136,18 @@ class MovieOverviewControl: NSView {
         // generate thumbnails for each page in background
         let generator = AVAssetImageGenerator(asset: item.asset) ※ {
             let scale = window?.backingScaleFactor ?? 1
-            $0.maximumSize = CGSize(width: pageSize.width * scale, height: pageSize.height * scale)
+//            $0.maximumSize = CGSize(width: pageSize.width * scale, height: pageSize.height * scale)
             $0.requestedTimeToleranceBefore = imageGeneratorTolerance
             $0.requestedTimeToleranceAfter = imageGeneratorTolerance
         }
         imageGenerator = generator
         generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
             guard let cgImage = cgImage where result == .Succeeded else { return }
+            
+            let animeFace = AnimeFace()
+            let faces = (animeFace.detect(cgImage) as! [NSValue]).map {$0.rectValue}
+            let timePercent = CGFloat(actualTime.convertScale(self.trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
+                / CGFloat(self.trimRange.duration.value)
 
             let thumb = NSImage(CGImage: cgImage, size: NSZeroSize)
 
@@ -161,6 +155,7 @@ class MovieOverviewControl: NSView {
                 guard self.imageGenerator === generator else { return } // avoid appending result from outdated requests
                 self.thumbnails.append(thumb)
                 self.setNeedsDisplayInRect(self.bounds)
+                self.faceAnnotationView.faces.append((at: timePercent, size: (faces.first?.width ?? 0) * (faces.first?.height ?? 0)))
             }
         }
     }
