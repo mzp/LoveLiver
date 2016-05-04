@@ -34,6 +34,8 @@ class MovieOverviewControl: NSView {
         tf.textColor = NSColor.whiteColor()
         tf.backgroundColor = NSColor.blackColor()
     }
+    
+    private let faceAnnotationView = FaceAnnotationView()
 
     var imageGenerator: AVAssetImageGenerator?
     var numberOfPages: UInt = 0 {
@@ -79,9 +81,24 @@ class MovieOverviewControl: NSView {
 
         let autolayout = northLayoutFormat([:], [
             "currentTime": currentTimeLabel,
+            "faceAnnotation": faceAnnotationView,
             ])
         autolayout("H:|[currentTime]")
+        autolayout("H:|[faceAnnotation]|")
+        autolayout("V:[faceAnnotation(==25)]|")
         autolayout("V:[currentTime]|")
+        
+        // TODO: remove dummy values
+        faceAnnotationView.faces = [
+            (0.5, 3),
+            (0.51, 2),
+            (0.52, 2),
+            (0.53, 1),
+            (0.7, 3),
+            (0.71, 2),
+            (0.72, 2),
+            (0.73, 1),
+        ]
 
         setContentCompressionResistancePriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
         setContentHuggingPriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
