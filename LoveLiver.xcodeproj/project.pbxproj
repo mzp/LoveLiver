@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		13110DB31CDA3A4A00A70C8C /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13110DB21CDA3A4A00A70C8C /* opencv2.framework */; };
 		C2C41F0CC51A39D97981D73D /* Pods_LoveLiver_osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */; };
 		EA27F5EF1C98426A00C23F40 /* MovieOverviewControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */; };
 		EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379AB81C68DE6D00106AEF /* AppDelegate.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		13110DB21CDA3A4A00A70C8C /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		133DFE3A1BC8C69900902407 /* JPEG.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JPEG.swift; sourceTree = "<group>"; };
 		133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickTimeMov.swift; sourceTree = "<group>"; };
 		3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LoveLiver_osx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				13110DB31CDA3A4A00A70C8C /* opencv2.framework in Frameworks */,
 				C2C41F0CC51A39D97981D73D /* Pods_LoveLiver_osx.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -100,6 +103,7 @@
 		EA379AB71C68DE6D00106AEF /* LoveLiver-osx */ = {
 			isa = PBXGroup;
 			children = (
+				13110DB21CDA3A4A00A70C8C /* opencv2.framework */,
 				EA379AB81C68DE6D00106AEF /* AppDelegate.swift */,
 				EA379AD81C6A283500106AEF /* MovieDocument.swift */,
 				EA379ADC1C6A2E8800106AEF /* MovieDocumentViewController.swift */,
@@ -346,6 +350,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/LoveLiver-osx",
+				);
 				INFOPLIST_FILE = "LoveLiver-osx/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.mzp.LoveLiver-osx";
@@ -360,6 +368,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/LoveLiver-osx",
+				);
 				INFOPLIST_FILE = "LoveLiver-osx/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "jp.mzp.LoveLiver-osx";
