@@ -33,6 +33,8 @@ class MovieDocumentViewController: NSViewController {
         b.action = #selector(self.createLivePhotoSandbox)
     }
 
+    private lazy var annotationView: AnnotationView = AnnotationView()
+
     init!(movieURL: NSURL, playerItem: AVPlayerItem, player: AVPlayer) {
         self.movieURL = movieURL
         self.playerItem = playerItem
@@ -51,10 +53,15 @@ class MovieDocumentViewController: NSViewController {
         let autolayout = view.northLayoutFormat(["p": 16], [
             "player": playerView,
             "posterButton": posterFrameButton,
+            "annotation": annotationView,
             ])
         autolayout("H:|[player]|")
+        autolayout("H:|[annotation]|")
         autolayout("H:|-p-[posterButton]-p-|")
-        autolayout("V:|[player]-p-[posterButton]-p-|")
+        autolayout("V:|[player]-p-[posterButton]")
+        autolayout("V:|[annotation]-p-[posterButton]")
+        autolayout("V:[posterButton]-p-|")
+        view.addSubview(annotationView, positioned: .Above, relativeTo: playerView) // TODO: use contentOverlayView of playerView
     }
 
     func movieDidLoad(videoSize: CGSize) {
@@ -70,18 +77,20 @@ class MovieDocumentViewController: NSViewController {
 
     // MARK: - AnimeFace
     var animeFaces = [DetectedFace]()
+    var playerTimeObserver: AnyObject?
     @IBAction func detectAnimeFace(sender: AnyObject?) {
+        let duration = playerItem.duration
+        let animeFace = AnimeFace()
         animeFaces.removeAll()
         self.movieOverviewViewController?.overview.faceAnnotationView.duration = playerItem.duration
-        let animeFace = AnimeFace()
 
-        let detectEachSecs: Double = 0.5
-        let times: [CMTime] = 0.stride(to: playerItem.duration.seconds, by: detectEachSecs).map { s in
-            CMTime(seconds: s, preferredTimescale: playerItem.duration.timescale)
+        let detectEachSecs: Double = 0.1
+        let times: [CMTime] = 0.stride(to: duration.seconds, by: detectEachSecs).map { s in
+            CMTime(seconds: s, preferredTimescale: duration.timescale)
         }
 
         let generator = AVAssetImageGenerator(asset: playerItem.asset)
-        generator.requestedTimeToleranceBefore = CMTime(seconds: detectEachSecs, preferredTimescale: playerItem.duration.timescale)
+        generator.requestedTimeToleranceBefore = CMTime(seconds: detectEachSecs / 2, preferredTimescale: duration.timescale)
         generator.requestedTimeToleranceAfter = generator.requestedTimeToleranceBefore
         generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { [weak self] (requestedTime, cgImage, actualTime, result, error) -> Void in
             guard let `self` = self else { return }
@@ -96,6 +105,56 @@ class MovieDocumentViewController: NSViewController {
                 }
                 self.movieOverviewViewController?.overview.faceAnnotationView.faces = self.animeFaces
             }
+        }
+
+        playerTimeObserver = player.addPeriodicTimeObserverForInterval(CMTime(seconds: detectEachSecs, preferredTimescale: duration.timescale), queue: dispatch_get_main_queue()) { [weak self] time in
+            guard let `self` = self else { return }
+            guard let videoSize = self.playerItem.naturalSize else { return }
+            let nearest = self.animeFaces
+                .filter {abs($0.at.seconds - time.seconds) <= detectEachSecs} // only near times (exclude scenes without any face)
+                .minElement{abs($0.at.seconds - time.seconds) < abs($1.at.seconds - time.seconds)} // find nearest detected time measured by actualTime choosen by the generator
+            let faces = nearest.map {nearest in self.animeFaces.filter {$0.at == nearest.at}} ?? []
+
+            // NSLog("%@", "\(faces.count)")
+
+            let scale = self.playerView.videoBounds.width / videoSize.width
+            let transform = CGAffineTransformMakeScale(scale, scale)
+            self.annotationView.annotations = faces.map { f in
+                return (rect: CGRectApplyAffineTransform(f.rect, transform), color: NSColor.greenColor().CGColor)
+            }
+        }
+    }
+}
+
+
+class AnnotationView: NSView {
+    var annotations = [(rect: CGRect, color: CGColor)]() {
+        didSet {
+            setNeedsDisplayInRect((oldValue + annotations).reduce(CGRectNull) {CGRectUnion($0, $1.rect)})
+        }
+    }
+
+    init() {
+        super.init(frame: .zero)
+        wantsLayer = true
+        layer?.zPosition = 1
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var flipped: Bool {return true}
+
+    override func drawRect(dirtyRect: NSRect) {
+        NSColor.clearColor().set()
+        NSRectFill(dirtyRect)
+
+        let context = NSGraphicsContext.currentContext()?.CGContext
+
+        for a in annotations {
+            CGContextSetFillColorWithColor(context, a.color)
+            NSFrameRectWithWidth(a.rect, 4)
         }
     }
 }
