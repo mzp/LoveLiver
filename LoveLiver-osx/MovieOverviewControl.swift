@@ -36,7 +36,7 @@ class MovieOverviewControl: NSView {
         tf.backgroundColor = NSColor.blackColor()
     }
     
-    private let faceAnnotationView = FaceAnnotationView()
+    let faceAnnotationView = FaceAnnotationView()
 
     var imageGenerator: AVAssetImageGenerator?
     var numberOfPages: UInt = 0 {
@@ -119,7 +119,6 @@ class MovieOverviewControl: NSView {
         imageGenerator?.cancelAllCGImageGeneration()
         imageGenerator = nil
         thumbnails.removeAll()
-        faceAnnotationView.faces.removeAll()
 
         guard let item = player.currentItem,
             let videoSize = item.naturalSize else {
@@ -151,27 +150,6 @@ class MovieOverviewControl: NSView {
                 guard self.imageGenerator === generator else { return } // avoid appending result from outdated requests
                 self.thumbnails.append(thumb)
                 self.setNeedsDisplayInRect(self.bounds)
-                
-                if UInt(self.thumbnails.count) == self.numberOfPages {
-                    let times2: [CMTime] = (0..<self.numberOfPages*10).map { i in
-                        CMTimeAdd(self.trimRange.start, CMTime(value: self.trimRange.duration.value * Int64(i) / Int64(self.numberOfPages*10), timescale: self.trimRange.duration.timescale))
-                    }
-                    generator.maximumSize = .zero
-                    generator.generateCGImagesAsynchronouslyForTimes(times2.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
-                        guard let cgImage = cgImage where result == .Succeeded else { return }
-                        
-                        let animeFace = AnimeFace()
-                        let faces = (animeFace.detect(cgImage) as! [NSValue]).map {$0.rectValue}
-                        let timePercent = CGFloat(actualTime.convertScale(self.trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
-                            / CGFloat(self.trimRange.duration.value)
-                        
-                        dispatch_async(dispatch_get_main_queue()) {
-                            let area = abs(faces.first?.width ?? 0) * abs(faces.first?.height ?? 0)
-                            guard area > 0 else { return }
-                            self.faceAnnotationView.faces.append((at: timePercent, size: area))
-                        }
-                    }
-                }
             }
         }
     }

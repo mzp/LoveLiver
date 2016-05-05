@@ -17,7 +17,11 @@ class MovieDocument: NSDocument, NSWindowDelegate {
     var mainWindow: NSWindow?
     var mainVC: MovieDocumentViewController?
     var overviewWindow: NSWindow?
-    var overviewVC: MovieOverviewViewController?
+    var overviewVC: MovieOverviewViewController? {
+        didSet {
+            mainVC?.movieOverviewViewController = overviewVC
+        }
+    }
 
     override func readFromURL(url: NSURL, ofType typeName: String) throws {
         NSLog("%@", "opening \(url)")

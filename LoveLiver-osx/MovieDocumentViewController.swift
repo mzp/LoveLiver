@@ -19,6 +19,8 @@ class MovieDocumentViewController: NSViewController {
     private let playerItem: AVPlayerItem
     var createLivePhotoAction: (Void -> Void)?
 
+    weak var movieOverviewViewController: MovieOverviewViewController?
+
     private let playerView: AVPlayerView = AVPlayerView() ※ { v in
         v.controlsStyle = .Floating
         v.showsFrameSteppingButtons = true
@@ -64,5 +66,36 @@ class MovieDocumentViewController: NSViewController {
     @objc private func createLivePhotoSandbox() {
         player.pause()
         createLivePhotoAction?()
+    }
+
+    // MARK: - AnimeFace
+    var animeFaces = [DetectedFace]()
+    @IBAction func detectAnimeFace(sender: AnyObject?) {
+        animeFaces.removeAll()
+        self.movieOverviewViewController?.overview.faceAnnotationView.duration = playerItem.duration
+        let animeFace = AnimeFace()
+
+        let detectEachSecs: Double = 0.5
+        let times: [CMTime] = 0.stride(to: playerItem.duration.seconds, by: detectEachSecs).map { s in
+            CMTime(seconds: s, preferredTimescale: playerItem.duration.timescale)
+        }
+
+        let generator = AVAssetImageGenerator(asset: playerItem.asset)
+        generator.requestedTimeToleranceBefore = CMTime(seconds: detectEachSecs, preferredTimescale: playerItem.duration.timescale)
+        generator.requestedTimeToleranceAfter = generator.requestedTimeToleranceBefore
+        generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { [weak self] (requestedTime, cgImage, actualTime, result, error) -> Void in
+            guard let `self` = self else { return }
+            guard let cgImage = cgImage where result == .Succeeded else { return }
+
+            let faces = (animeFace.detect(cgImage)).map {$0.rectValue}
+            guard !faces.isEmpty else { return }
+
+            dispatch_async(dispatch_get_main_queue()) {
+                for f in faces {
+                    self.animeFaces.append(DetectedFace(at: actualTime, rect: NSRectToCGRect(f)))
+                }
+                self.movieOverviewViewController?.overview.faceAnnotationView.faces = self.animeFaces
+            }
+        }
     }
 }

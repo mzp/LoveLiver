@@ -30,7 +30,7 @@
     return cvMat;
 }
 
-- (NSArray*) detect: (CGImageRef)cgImage {
+- (NSArray<NSValue *>*) detect: (CGImageRef)cgImage {
     cv::CascadeClassifier face_cascade;
     NSString* path = [[NSBundle mainBundle] pathForResource:@"lbpcascade_animeface" ofType:@"xml"];
     face_cascade.load([path cStringUsingEncoding:NSUTF8StringEncoding]);
@@ -45,7 +45,7 @@
     std::vector<cv::Rect> faces;
     face_cascade.detectMultiScale(gray, faces, 1.1, 3, 0, cv::Size(80,80));
 
-    NSMutableArray* array = [NSMutableArray array];
+    NSMutableArray<NSValue *>* array = [NSMutableArray array];
     for(int i = 0; i<faces.size(); i++){
         cv::Rect cvRect = faces[i];
         NSRect rect = NSMakeRect(cvRect.x, cvRect.y, cvRect.width, cvRect.height);

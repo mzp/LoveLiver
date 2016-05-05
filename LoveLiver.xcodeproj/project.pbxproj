@@ -115,16 +115,13 @@
 		EA379AB71C68DE6D00106AEF /* LoveLiver-osx */ = {
 			isa = PBXGroup;
 			children = (
-				13110DB21CDA3A4A00A70C8C /* opencv2.framework */,
 				EA379AB81C68DE6D00106AEF /* AppDelegate.swift */,
-				13110DB41CDA3A7400A70C8C /* AnimeFace.h */,
-				13110DB61CDA3A8500A70C8C /* AnimeFace.mm */,
 				EA379AD81C6A283500106AEF /* MovieDocument.swift */,
 				EA379ADC1C6A2E8800106AEF /* MovieDocumentViewController.swift */,
 				EA88135E1C9ED065000CE151 /* MovieOverviewViewController.swift */,
 				EA6D28881C9EF49200F06E79 /* LivePhotoSandboxViewController.swift */,
 				EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */,
-				EA7E45D11CDA2E1F00542E17 /* FaceAnnotationView.swift */,
+				EA9C94411CDB85C3001A77D8 /* AnimeFaceAnnotation */,
 				EA6D28861C9EF0FD00F06E79 /* AVKitExtension.swift */,
 				EA379ABA1C68DE6D00106AEF /* Assets.xcassets */,
 				13110DB81CDA3CB400A70C8C /* lbpcascade_animeface.xml */,
@@ -133,6 +130,17 @@
 				13110DB51CDA3A8400A70C8C /* LoveLiver-osx-Bridging-Header.h */,
 			);
 			path = "LoveLiver-osx";
+			sourceTree = "<group>";
+		};
+		EA9C94411CDB85C3001A77D8 /* AnimeFaceAnnotation */ = {
+			isa = PBXGroup;
+			children = (
+				13110DB21CDA3A4A00A70C8C /* opencv2.framework */,
+				13110DB41CDA3A7400A70C8C /* AnimeFace.h */,
+				13110DB61CDA3A8500A70C8C /* AnimeFace.mm */,
+				EA7E45D11CDA2E1F00542E17 /* FaceAnnotationView.swift */,
+			);
+			name = AnimeFaceAnnotation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

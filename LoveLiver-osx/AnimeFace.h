@@ -2,5 +2,5 @@
 #import <CoreGraphics/CGImage.h>
 
 @interface AnimeFace : NSObject
-- (NSArray*) detect: (CGImageRef)cgImage;
+- (NSArray<NSValue *>*) detect: (CGImageRef)cgImage;
 @end

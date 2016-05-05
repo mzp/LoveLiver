@@ -7,16 +7,30 @@
 //
 
 import AppKit
+import AVFoundation
+
+
+struct DetectedFace {
+    /// time detected
+    let at: CMTime
+    /// detected face bounds in original video resolution
+    let rect: CGRect
+
+    var size: CGFloat {
+        return rect.width * rect.height
+    }
+}
 
 
 class FaceAnnotationView: NSView {
+    var duration = kCMTimeZero
     // at: time percent in video length, size: area size of face
-    var faces = [(at: CGFloat, size: CGFloat)]() {
+    var faces = [DetectedFace]() {
         didSet {
             setNeedsDisplayInRect(bounds)
         }
     }
-    
+
     override var opaque: Bool {return false}
     
     override func drawRect(dirtyRect: NSRect) {
@@ -25,18 +39,21 @@ class FaceAnnotationView: NSView {
         guard !faces.isEmpty else { return }
         
         let path = NSBezierPath()
-        
-        let maxSize = faces.maxElement {$0.size < $1.size}?.size ?? 0
+
         path.moveToPoint(.zero)
-        for x in 0.stride(to: Int(bounds.width), by: 4) {
-            let s = faces.filter({abs($0.at * bounds.width - CGFloat(x)) <= 4}).maxElement {$0.size < $1.size}?.size ?? 0
-            path.lineToPoint(NSPoint(x: CGFloat(x), y: bounds.height * (s / maxSize)))
+        let points: [CGPoint] = 0.stride(to: Int(bounds.width), by: 4).map { x in
+            let s = faces.filter({abs(CGFloat($0.at.seconds / duration.seconds) * bounds.width - CGFloat(x)) <= 4}).reduce(0) {$0 + $1.size}
+            return CGPoint(x: CGFloat(x), y: s)
+        }
+        let maxSize = points.maxElement {$0.y < $1.y}?.y ?? 0
+        for p in points {
+            path.lineToPoint(NSPoint(x: p.x, y: p.y * bounds.height / maxSize))
         }
         path.lineToPoint(NSPoint(x: bounds.width, y: 0))
         
-        NSColor.redColor().colorWithAlphaComponent(0.75).set()
+        NSColor.greenColor().colorWithAlphaComponent(0.75).set()
         path.fill()
-        NSColor.redColor().set()
+        NSColor.greenColor().set()
         path.stroke()
     }
 }
