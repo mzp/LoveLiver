@@ -21,12 +21,12 @@ class MovieOverviewControl: NSView {
     var currentTime: CMTime? {
         didSet { updateCurrentTime() }
     }
-    private(set) lazy var currentTimeBar: NSView = NSView(frame: NSZeroRect) ※ { v in
+    fileprivate(set) lazy var currentTimeBar: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
         v.layer?.backgroundColor = NSColor.redColor().CGColor
         self.addSubview(v)
     }
-    private lazy var currentTimeLabel: NSTextField = NSTextField(frame: NSZeroRect) ※ { tf in
+    fileprivate lazy var currentTimeLabel: NSTextField = NSTextField(frame: NSZeroRect) ※ { tf in
         tf.bezeled = false
         tf.editable = false
         tf.drawsBackground = true
@@ -37,7 +37,7 @@ class MovieOverviewControl: NSView {
 
     var imageGenerator: AVAssetImageGenerator?
     var numberOfPages: UInt = 0 {
-        didSet { setNeedsDisplayInRect(bounds) }
+        didSet { setNeedsDisplay(bounds) }
     }
     var thumbnails = [NSImage]()
     var imageGeneratorTolerance = CMTime(seconds: 300, preferredTimescale: 600)
@@ -46,30 +46,30 @@ class MovieOverviewControl: NSView {
     var trimRange: CMTimeRange { didSet { reload() } } // show overview only within trimRange
     var scopeRange: CMTimeRange? { // if non-nil, shows scope control
         didSet {
-            if let old = oldValue, let new = scopeRange where CMTimeRangeEqual(old, new) {
+            if let old = oldValue, let new = scopeRange, CMTimeRangeEqual(old, new) {
                 return
             }
             updateScope()
-            onScopeChange?(dragging: mouseDownLocation != nil)
+            onScopeChange?(mouseDownLocation != nil)
         }
     }
-    var shouldUpdateScopeRange: ((newValue: CMTimeRange?) -> Bool)?
-    var onScopeChange: ((dragging: Bool) -> Void)?
-    private lazy var scopeMaskLeftView: NSView = NSView(frame: NSZeroRect) ※ { v in
+    var shouldUpdateScopeRange: ((_ newValue: CMTimeRange?) -> Bool)?
+    var onScopeChange: ((_ dragging: Bool) -> Void)?
+    fileprivate lazy var scopeMaskLeftView: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
         v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).CGColor
         v.hidden = true
     }
-    private lazy var scopeMaskRightView: NSView = NSView(frame: NSZeroRect) ※ { v in
+    fileprivate lazy var scopeMaskRightView: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
         v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).CGColor
         v.hidden = true
     }
 
     enum DraggingMode {
-        case Seek, Scope
+        case seek, scope
     }
-    var draggingMode = DraggingMode.Seek
+    var draggingMode = DraggingMode.seek
 
     init(player: AVPlayer, playerItem: AVPlayerItem) {
         self.player = player
@@ -83,19 +83,19 @@ class MovieOverviewControl: NSView {
         autolayout("H:|[currentTime]")
         autolayout("V:[currentTime]|")
 
-        setContentCompressionResistancePriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
-        setContentHuggingPriority(NSLayoutPriorityDefaultHigh, forOrientation: .Vertical)
+        setContentCompressionResistancePriority(NSLayoutPriorityDefaultHigh, for: .vertical)
+        setContentHuggingPriority(NSLayoutPriorityDefaultHigh, for: .vertical)
 
         // subviews ordering
         addSubview(scopeMaskLeftView)
         addSubview(scopeMaskRightView)
-        sortSubviewsUsingFunction({ (v1, v2, context) -> NSComparisonResult in
-            let s = Unmanaged<MovieOverviewControl>.fromOpaque(COpaquePointer(context)).takeUnretainedValue()
+        sortSubviews({ (v1, v2, context) -> ComparisonResult in
+            let s = Unmanaged<MovieOverviewControl>.fromOpaque(OpaquePointer(context)!).takeUnretainedValue()
             switch (v1, v2) {
-            case (s.currentTimeLabel, _): return .OrderedDescending
-            default: return .OrderedSame
+            case (s.currentTimeLabel, _): return .orderedDescending
+            default: return .orderedSame
             }
-            }, context: UnsafeMutablePointer<Void>(Unmanaged.passUnretained(self).toOpaque()))
+            }, context: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
 
         observePlayer()
         updateCurrentTime()
@@ -136,7 +136,7 @@ class MovieOverviewControl: NSView {
         }
         imageGenerator = generator
         generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
-            guard let cgImage = cgImage where result == .Succeeded else { return }
+            guard let cgImage = cgImage, result == .Succeeded else { return }
 
             let thumb = NSImage(CGImage: cgImage, size: NSZeroSize)
 
@@ -153,9 +153,9 @@ class MovieOverviewControl: NSView {
             player.removeTimeObserver(playerTimeObserver)
         }
 
-        playerTimeObserver = player.addPeriodicTimeObserverForInterval(CMTime(value: 1, timescale: 30), queue: dispatch_get_main_queue()) { [weak self] time in
+        playerTimeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 30), queue: DispatchQueue.main) { [weak self] time in
             self?.currentTime = time
-        }
+        } as AnyObject?
     }
 
     override func viewDidEndLiveResize() {
@@ -168,112 +168,112 @@ class MovieOverviewControl: NSView {
         didSet { updateCurrentTime() }
     }
 
-    private func updateCurrentTime() {
+    fileprivate func updateCurrentTime() {
         if let time = currentTime {
-            let p = CGFloat(CMTimeSubtract(time, trimRange.start).convertScale(trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
+            let p = CGFloat(CMTimeSubtract(time, trimRange.start).convertScale(trimRange.duration.timescale, method: CMTimeRoundingMethod.default).value)
                 / CGFloat(trimRange.duration.value)
-            currentTimeBar.hidden = false
+            currentTimeBar.isHidden = false
             currentTimeBar.frame = NSRect(x: p * bounds.width, y: 0, width: 1, height: bounds.height)
             currentTimeLabel.stringValue = time.stringInmmssSS
         } else {
-            currentTimeBar.hidden = true
+            currentTimeBar.isHidden = true
             currentTimeLabel.stringValue = "--:--.--"
         }
     }
 
-    private func updateScope() {
+    fileprivate func updateScope() {
         if let s = scopeRange {
-            let startPercent = CGFloat(CMTimeSubtract(s.start, trimRange.start).convertScale(trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
+            let startPercent = CGFloat(CMTimeSubtract(s.start, trimRange.start).convertScale(trimRange.duration.timescale, method: CMTimeRoundingMethod.default).value)
                 / CGFloat(trimRange.duration.value)
-            let endPercent = CGFloat(CMTimeSubtract(s.end, trimRange.start).convertScale(trimRange.duration.timescale, method: CMTimeRoundingMethod.Default).value)
+            let endPercent = CGFloat(CMTimeSubtract(s.end, trimRange.start).convertScale(trimRange.duration.timescale, method: CMTimeRoundingMethod.default).value)
                 / CGFloat(trimRange.duration.value)
 
-            scopeMaskLeftView.hidden = false
-            scopeMaskRightView.hidden = false
+            scopeMaskLeftView.isHidden = false
+            scopeMaskRightView.isHidden = false
 
             scopeMaskLeftView.frame = NSRect(x: 0, y: 0, width: startPercent * bounds.width, height: bounds.height)
             scopeMaskRightView.frame = NSRect(x: endPercent * bounds.width, y: 0, width: bounds.width - endPercent * bounds.width, height: bounds.height)
 
             updateForwardPlaybackEndTime()
         } else {
-            scopeMaskLeftView.hidden = true
-            scopeMaskRightView.hidden = true
+            scopeMaskLeftView.isHidden = true
+            scopeMaskRightView.isHidden = true
 
             player.currentItem?.forwardPlaybackEndTime = trimRange.end
         }
     }
 
-    private func updateForwardPlaybackEndTime() {
+    fileprivate func updateForwardPlaybackEndTime() {
         // scope playback to end of scopeRange
         // this is relatively heavy operation. ignore on dragging
 
-        if let s = scopeRange where mouseDownLocation == nil {
+        if let s = scopeRange, mouseDownLocation == nil {
             player.currentItem?.forwardPlaybackEndTime = s.end
         }
     }
 
-    override func drawRect(dirtyRect: NSRect) {
-        NSColor.blackColor().setFill()
-        NSRectFillUsingOperation(dirtyRect, .CompositeCopy)
+    override func draw(_ dirtyRect: NSRect) {
+        NSColor.black.setFill()
+        NSRectFillUsingOperation(dirtyRect, .copy)
 
         var x: CGFloat = 0
         for t in thumbnails {
             let pageRect = NSRect(x: x, y: 0, width: bounds.height / t.size.height * t.size.width, height: bounds.height)
-            t.drawInRect(pageRect)
+            t.draw(in: pageRect)
             x += pageRect.width
         }
     }
 
-    private var mouseDownLocation: NSPoint?
-    private var scopeRangeOnMouseDown: CMTimeRange?
+    fileprivate var mouseDownLocation: NSPoint?
+    fileprivate var scopeRangeOnMouseDown: CMTimeRange?
 
-    override func mouseDown(theEvent: NSEvent) {
-        mouseDownLocation = convertPoint(theEvent.locationInWindow, fromView: nil)
+    override func mouseDown(with theEvent: NSEvent) {
+        mouseDownLocation = convert(theEvent.locationInWindow, from: nil)
         scopeRangeOnMouseDown = scopeRange
 
         switch draggingMode {
-        case .Seek: seekToMousePosition(theEvent)
-        case .Scope: break
+        case .seek: seekToMousePosition(theEvent)
+        case .scope: break
         }
     }
 
-    override func mouseDragged(theEvent: NSEvent) {
+    override func mouseDragged(with theEvent: NSEvent) {
         switch draggingMode {
-        case .Seek: seekToMousePosition(theEvent)
-        case .Scope: scopeToMousePosition(theEvent)
+        case .seek: seekToMousePosition(theEvent)
+        case .scope: scopeToMousePosition(theEvent)
         }
     }
 
-    override func mouseUp(theEvent: NSEvent) {
+    override func mouseUp(with theEvent: NSEvent) {
         mouseDownLocation = nil
         scopeRangeOnMouseDown = nil
 
         switch draggingMode {
-        case .Seek: break
-        case .Scope:
-            onScopeChange?(dragging: false)
+        case .seek: break
+        case .scope:
+            onScopeChange?(false)
             updateForwardPlaybackEndTime()
         }
     }
 
-    private func seekToMousePosition(theEvent: NSEvent) {
-        let p = convertPoint(theEvent.locationInWindow, fromView: nil)
+    fileprivate func seekToMousePosition(_ theEvent: NSEvent) {
+        let p = convert(theEvent.locationInWindow, from: nil)
         let time = CMTimeAdd(CMTime(value: Int64(CGFloat(trimRange.duration.value) * p.x / bounds.width), timescale: trimRange.duration.timescale), trimRange.start)
-        player.seekToTime(time, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+        player.seek(to: time, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
     }
 
-    private func scopeToMousePosition(theEvent: NSEvent) {
+    fileprivate func scopeToMousePosition(_ theEvent: NSEvent) {
         guard let mouseDownLocation = mouseDownLocation,
             let s = scopeRangeOnMouseDown,
             let minFrameDuration = player.currentItem?.minFrameDuration else { return }
-        let p = convertPoint(theEvent.locationInWindow, fromView: nil)
+        let p = convert(theEvent.locationInWindow, from: nil)
 
         let distance = Int32(p.x - mouseDownLocation.x)
         let start = CMTimeAdd(s.start, CMTimeMultiply(minFrameDuration, distance))
         let end = CMTimeAdd(s.end, CMTimeMultiply(minFrameDuration, distance))
         let newScopeRange = CMTimeRange(start: start, end: end)
 
-        if shouldUpdateScopeRange?(newValue: newScopeRange) == true {
+        if shouldUpdateScopeRange?(newScopeRange) == true {
             scopeRange = newScopeRange
         }
     }
