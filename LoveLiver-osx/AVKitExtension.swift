@@ -7,7 +7,7 @@
 //
 
 import AVFoundation
-
+import AppKit
 
 extension CMTime {
     var msS: (Int, Int, Int) {

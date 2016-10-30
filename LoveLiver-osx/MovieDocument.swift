@@ -84,10 +84,12 @@ class MovieDocument: NSDocument, NSWindowDelegate {
     }
 
     func windowDidResize(_ notification: Notification) {
-        if notification.object === mainWindow {
-            repositionOverviewWindow()
-        } else if notification.object === overviewWindow {
-            repositionMainWindow()
+        if let object = notification.object as? NSWindow {
+            if object === mainWindow {
+                repositionOverviewWindow()
+            } else if object === overviewWindow {
+                repositionMainWindow()
+            }
         }
     }
 

@@ -19,11 +19,11 @@ private let outputDir = URL(fileURLWithPath: NSHomeDirectory()).appendingPathCom
 
 private func label() -> NSTextField {
     return NSTextField() ※ { tf in
-        tf.bezeled = false
-        tf.editable = false
+        tf.isBezeled = false
+        tf.isEditable = false
         tf.drawsBackground = false
-        tf.textColor = NSColor.grayColor()
-        tf.font = NSFont.monospacedDigitSystemFontOfSize(12, weight: NSFontWeightRegular)
+        tf.textColor = NSColor.gray
+        tf.font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: NSFontWeightRegular)
     }
 }
 
@@ -31,7 +31,7 @@ private func label() -> NSTextField {
 class LivePhotoSandboxViewController: NSViewController {
     fileprivate let baseFilename: String
     fileprivate lazy var exportButton: NSButton = NSButton() ※ { b in
-        b.bezelStyle = .RegularSquareBezelStyle
+        b.bezelStyle = .regularSquare
         b.title = "Create Live Photo"
         b.target = self
         b.action = #selector(self.export)
@@ -39,7 +39,7 @@ class LivePhotoSandboxViewController: NSViewController {
     fileprivate var exportSession: AVAssetExportSession?
 
     fileprivate lazy var closeButton: NSButton = NSButton() ※ { b in
-        b.bezelStyle = .RegularSquareBezelStyle
+        b.bezelStyle = .regularSquare
         b.title = "Close"
         b.target = self
         b.action = #selector(self.close)
@@ -52,7 +52,7 @@ class LivePhotoSandboxViewController: NSViewController {
 
     fileprivate let player: AVPlayer
     fileprivate let playerView: AVPlayerView = AVPlayerView() ※ { v in
-        v.controlsStyle = .None
+        v.controlsStyle = .none
     }
     fileprivate let overview: MovieOverviewControl
 
@@ -254,7 +254,8 @@ class LivePhotoSandboxViewController: NSViewController {
             guard !FileManager.default.fileExists(atPath: path) else { return }
         }
 
-        guard image.TIFFRepresentation?.writeToFile(tmpImagePath, atomically: true) == true else { return }
+//        guard image.TIFFRepresentation?.writeToFile(tmpImagePath, atomically: true) == true else { return }
+        guard let _ = try? image.tiffRepresentation?.write(to: URL(fileURLWithPath: tmpImagePath), options: [.atomic]) else { return }
         // create AVAssetExportSession each time because it cannot be reused after export completion
         guard let session = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetPassthrough) else { return }
         session.outputFileType = "com.apple.quicktime-movie"
@@ -291,7 +292,7 @@ class LivePhotoSandboxViewController: NSViewController {
 
         // wait until Finder is active or timed out,
         // to avoid openURLs overtaking Finder activation
-        DispatchQueue.global(priority: 0).async {
+        DispatchQueue.global(qos: .default).async {
             let start = Date()
             while NSWorkspace.shared().frontmostApplication?.bundleIdentifier != "com.apple.finder" && Date().timeIntervalSince(start) < 5 {
                 Thread.sleep(forTimeInterval: 0.1)

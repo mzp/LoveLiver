@@ -154,7 +154,7 @@ class QuickTimeMov {
             "com.apple.metadata.datatype.int8"            ]
 
         var desc : CMFormatDescription? = nil
-        CMMetadataFormatDescriptionCreateWithMetadataSpecifications(kCFAllocatorDefault, kCMMetadataFormatType_Boxed, [spec], &desc)
+        CMMetadataFormatDescriptionCreateWithMetadataSpecifications(kCFAllocatorDefault, kCMMetadataFormatType_Boxed, [spec] as CFArray, &desc)
         let input = AVAssetWriterInput(mediaType: AVMediaTypeMetadata,
             outputSettings: nil, sourceFormatHint: desc)
         return AVAssetWriterInputMetadataAdaptor(assetWriterInput: input)

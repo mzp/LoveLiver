@@ -23,16 +23,16 @@ class MovieOverviewControl: NSView {
     }
     fileprivate(set) lazy var currentTimeBar: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
-        v.layer?.backgroundColor = NSColor.redColor().CGColor
+        v.layer?.backgroundColor = NSColor.red.cgColor
         self.addSubview(v)
     }
     fileprivate lazy var currentTimeLabel: NSTextField = NSTextField(frame: NSZeroRect) ※ { tf in
-        tf.bezeled = false
-        tf.editable = false
+        tf.isBezeled = false
+        tf.isEditable = false
         tf.drawsBackground = true
-        tf.font = NSFont.monospacedDigitSystemFontOfSize(12, weight: NSFontWeightRegular)
-        tf.textColor = NSColor.whiteColor()
-        tf.backgroundColor = NSColor.blackColor()
+        tf.font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: NSFontWeightRegular)
+        tf.textColor = NSColor.white
+        tf.backgroundColor = NSColor.black
     }
 
     var imageGenerator: AVAssetImageGenerator?
@@ -57,13 +57,13 @@ class MovieOverviewControl: NSView {
     var onScopeChange: ((_ dragging: Bool) -> Void)?
     fileprivate lazy var scopeMaskLeftView: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
-        v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).CGColor
-        v.hidden = true
+        v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).cgColor
+        v.isHidden = true
     }
     fileprivate lazy var scopeMaskRightView: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
-        v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).CGColor
-        v.hidden = true
+        v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).cgColor
+        v.isHidden = true
     }
 
     enum DraggingMode {
@@ -90,7 +90,7 @@ class MovieOverviewControl: NSView {
         addSubview(scopeMaskLeftView)
         addSubview(scopeMaskRightView)
         sortSubviews({ (v1, v2, context) -> ComparisonResult in
-            let s = Unmanaged<MovieOverviewControl>.fromOpaque(OpaquePointer(context)!).takeUnretainedValue()
+            let s = Unmanaged<MovieOverviewControl>.fromOpaque(context!).takeUnretainedValue()
             switch (v1, v2) {
             case (s.currentTimeLabel, _): return .orderedDescending
             default: return .orderedSame
@@ -135,15 +135,15 @@ class MovieOverviewControl: NSView {
             $0.requestedTimeToleranceAfter = imageGeneratorTolerance
         }
         imageGenerator = generator
-        generator.generateCGImagesAsynchronouslyForTimes(times.map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
-            guard let cgImage = cgImage, result == .Succeeded else { return }
+        generator.generateCGImagesAsynchronously(forTimes: times.map {NSValue(time: $0)}) { (requestedTime, cgImage, actualTime, result, error) -> Void in
+            guard let cgImage = cgImage, result == .succeeded else { return }
 
-            let thumb = NSImage(CGImage: cgImage, size: NSZeroSize)
+            let thumb = NSImage(cgImage: cgImage, size: NSZeroSize)
 
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 guard self.imageGenerator === generator else { return } // avoid appending result from outdated requests
                 self.thumbnails.append(thumb)
-                self.setNeedsDisplayInRect(self.bounds)
+                self.setNeedsDisplay(self.bounds)
             }
         }
     }

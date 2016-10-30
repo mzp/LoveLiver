@@ -20,13 +20,13 @@ class MovieDocumentViewController: NSViewController {
     var createLivePhotoAction: ((Void) -> Void)?
 
     fileprivate let playerView: AVPlayerView = AVPlayerView() ※ { v in
-        v.controlsStyle = .Floating
+        v.controlsStyle = .floating
         v.showsFrameSteppingButtons = true
     }
     fileprivate lazy var posterFrameButton: NSButton = NSButton() ※ { b in
         b.title = "Live Photo With This Frame"
-        b.setButtonType(.MomentaryLightButton)
-        b.bezelStyle = .RoundedBezelStyle
+        b.setButtonType(.momentaryLight)
+        b.bezelStyle = .rounded
         b.target = self
         b.action = #selector(self.createLivePhotoSandbox)
     }
