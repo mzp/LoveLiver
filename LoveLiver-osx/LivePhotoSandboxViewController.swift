@@ -13,63 +13,63 @@ import NorthLayout
 import Ikemen
 
 
-private let livePhotoDuration: NSTimeInterval = 3
-private let outputDir = NSURL(fileURLWithPath: NSHomeDirectory()).URLByAppendingPathComponent("Pictures/LoveLiver")
+private let livePhotoDuration: TimeInterval = 3
+private let outputDir = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Pictures/LoveLiver")
 
 
 private func label() -> NSTextField {
     return NSTextField() ※ { tf in
-        tf.bezeled = false
-        tf.editable = false
+        tf.isBezeled = false
+        tf.isEditable = false
         tf.drawsBackground = false
-        tf.textColor = NSColor.grayColor()
-        tf.font = NSFont.monospacedDigitSystemFontOfSize(12, weight: NSFontWeightRegular)
+        tf.textColor = NSColor.gray
+        tf.font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: NSFontWeightRegular)
     }
 }
 
 
 class LivePhotoSandboxViewController: NSViewController {
-    private let baseFilename: String
-    private lazy var exportButton: NSButton = NSButton() ※ { b in
-        b.bezelStyle = .RegularSquareBezelStyle
+    fileprivate let baseFilename: String
+    fileprivate lazy var exportButton: NSButton = NSButton() ※ { b in
+        b.bezelStyle = .regularSquare
         b.title = "Create Live Photo"
         b.target = self
         b.action = #selector(self.export)
     }
-    private var exportSession: AVAssetExportSession?
+    fileprivate var exportSession: AVAssetExportSession?
 
-    private lazy var closeButton: NSButton = NSButton() ※ { b in
-        b.bezelStyle = .RegularSquareBezelStyle
+    fileprivate lazy var closeButton: NSButton = NSButton() ※ { b in
+        b.bezelStyle = .regularSquare
         b.title = "Close"
         b.target = self
         b.action = #selector(self.close)
     }
-    var closeAction: (Void -> Void)?
+    var closeAction: ((Void) -> Void)?
 
-    private func updateButtons() {
-        exportButton.enabled = (exportSession == nil)
+    fileprivate func updateButtons() {
+        exportButton.isEnabled = (exportSession == nil)
     }
 
-    private let player: AVPlayer
-    private let playerView: AVPlayerView = AVPlayerView() ※ { v in
-        v.controlsStyle = .None
+    fileprivate let player: AVPlayer
+    fileprivate let playerView: AVPlayerView = AVPlayerView() ※ { v in
+        v.controlsStyle = .none
     }
-    private let overview: MovieOverviewControl
+    fileprivate let overview: MovieOverviewControl
 
-    private let startFrameView = NSImageView()
-    private let endFrameView = NSImageView()
-    private let imageGenerator: AVAssetImageGenerator
-    private func updateImages() {
+    fileprivate let startFrameView = NSImageView()
+    fileprivate let endFrameView = NSImageView()
+    fileprivate let imageGenerator: AVAssetImageGenerator
+    fileprivate func updateImages() {
         imageGenerator.cancelAllCGImageGeneration()
-        imageGenerator.generateCGImagesAsynchronouslyForTimes([startTime, endTime].map {NSValue(CMTime: $0)}) { (requestedTime, cgImage, actualTime, result, error) in
-            guard let cgImage = cgImage where result == .Succeeded else { return }
+        imageGenerator.generateCGImagesAsynchronously(forTimes: [startTime, endTime].map {NSValue(time: $0)}) { (requestedTime, cgImage, actualTime, result, error) in
+            guard let cgImage = cgImage, result == .succeeded else { return }
 
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 if requestedTime == self.startTime {
-                    self.startFrameView.image = NSImage(CGImage: cgImage, size: NSZeroSize)
+                    self.startFrameView.image = NSImage(cgImage: cgImage, size: NSZeroSize)
                 }
                 if requestedTime == self.endTime {
-                    self.endFrameView.image = NSImage(CGImage: cgImage, size: NSZeroSize)
+                    self.endFrameView.image = NSImage(cgImage: cgImage, size: NSZeroSize)
                 }
             }
         }
@@ -88,19 +88,19 @@ class LivePhotoSandboxViewController: NSViewController {
             updateScope()
         }
     }
-    private let startLabel = label()
-    private let beforePosterLabel = label()
-    private let posterLabel = label()
-    private let afterPosterLabel = label()
-    private let endLabel = label()
-    private func updateLabels() {
+    fileprivate let startLabel = label()
+    fileprivate let beforePosterLabel = label()
+    fileprivate let posterLabel = label()
+    fileprivate let afterPosterLabel = label()
+    fileprivate let endLabel = label()
+    fileprivate func updateLabels() {
         startLabel.stringValue = startTime.stringInmmssSS
         beforePosterLabel.stringValue = " ~ \(CMTimeSubtract(posterTime, startTime).stringInsSS) ~ "
         posterLabel.stringValue = posterTime.stringInmmssSS
         afterPosterLabel.stringValue = " ~ \(CMTimeSubtract(endTime, posterTime).stringInsSS) ~ "
         endLabel.stringValue = endTime.stringInmmssSS
     }
-    private func updateScope() {
+    fileprivate func updateScope() {
         let duration = player.currentItem?.duration ?? kCMTimeZero
 
         if CMTimeMaximum(kCMTimeZero, startTime) == kCMTimeZero {
@@ -119,7 +119,7 @@ class LivePhotoSandboxViewController: NSViewController {
         let item = AVPlayerItem(asset: asset)
 
         self.baseFilename = baseFilename
-        posterTime = CMTimeConvertScale(player.currentTime(), max(600, player.currentTime().timescale), .Default) // timescale = 1 (too inaccurate) when posterTime = 0
+        posterTime = CMTimeConvertScale(player.currentTime(), max(600, player.currentTime().timescale), .default) // timescale = 1 (too inaccurate) when posterTime = 0
         let duration = item.duration
         let offset = CMTime(seconds: livePhotoDuration / 2, preferredTimescale: posterTime.timescale)
         startTime = CMTimeMaximum(kCMTimeZero, CMTimeSubtract(posterTime, offset))
@@ -134,13 +134,13 @@ class LivePhotoSandboxViewController: NSViewController {
         }
 
         overview = MovieOverviewControl(player: self.player, playerItem: item)
-        overview.draggingMode = .Scope
+        overview.draggingMode = .scope
         overview.imageGeneratorTolerance = kCMTimeZero
 
         super.init(nibName: nil, bundle: nil)
 
         self.player.volume = player.volume
-        self.player.actionAtItemEnd = .Pause
+        self.player.actionAtItemEnd = .pause
         self.playerView.player = self.player
 
         self.player.addObserver(self, forKeyPath: "rate", options: [], context: nil)
@@ -190,10 +190,10 @@ class LivePhotoSandboxViewController: NSViewController {
         autolayout("V:[overview]-p-[endFrame(==startFrame)][endLabel]-p-|")
 
         if let videoSize = player.currentItem?.naturalSize {
-            playerView.addConstraint(NSLayoutConstraint(item: playerView, attribute: .Height, relatedBy: .Equal,
-                toItem: playerView, attribute: .Width, multiplier: videoSize.height / videoSize.width, constant: 0))
+            playerView.addConstraint(NSLayoutConstraint(item: playerView, attribute: .height, relatedBy: .equal,
+                toItem: playerView, attribute: .width, multiplier: videoSize.height / videoSize.width, constant: 0))
 
-            startFrameView.addConstraint(NSLayoutConstraint(item: startFrameView, attribute: .Width, relatedBy: .Equal, toItem: startFrameView, attribute: .Height, multiplier: videoSize.width / videoSize.height, constant: 0))
+            startFrameView.addConstraint(NSLayoutConstraint(item: startFrameView, attribute: .width, relatedBy: .equal, toItem: startFrameView, attribute: .height, multiplier: videoSize.width / videoSize.height, constant: 0))
         }
 
         updateLabels()
@@ -219,7 +219,7 @@ class LivePhotoSandboxViewController: NSViewController {
         playerView.addGestureRecognizer(playerViewClickGesture)
     }
 
-    func onScopeChange(dragging: Bool) {
+    func onScopeChange(_ dragging: Bool) {
         guard let s = overview.scopeRange?.start,
             let e = overview.scopeRange?.end else { return }
         startTime = CMTimeMaximum(kCMTimeZero, s)
@@ -230,53 +230,54 @@ class LivePhotoSandboxViewController: NSViewController {
         }
     }
 
-    @objc private func export() {
+    @objc fileprivate func export() {
         guard let asset = player.currentItem?.asset else { return }
         let imageGenerator = AVAssetImageGenerator(asset: asset) ※ {
             $0.requestedTimeToleranceBefore = kCMTimeZero
             $0.requestedTimeToleranceAfter = kCMTimeZero
         }
         guard let image = imageGenerator.copyImage(at: posterTime) else { return }
-        guard let _ = try? NSFileManager.defaultManager().createDirectoryAtPath(outputDir.path!, withIntermediateDirectories: true, attributes: nil) else { return }
+        guard let _ = try? FileManager.default.createDirectory(atPath: outputDir.path, withIntermediateDirectories: true, attributes: nil) else { return }
 
-        let assetIdentifier = NSUUID().UUIDString
+        let assetIdentifier = UUID().uuidString
         let basename = [
             baseFilename,
             posterTime.stringInmmmsssSS,
-            assetIdentifier].joinWithSeparator("-")
-        let tmpImagePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(basename).tiff").path!
-        let tmpMoviePath = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent("\(basename).mov").path!
-        let imagePath = outputDir.URLByAppendingPathComponent("\(basename).JPG").path!
-        let moviePath = outputDir.URLByAppendingPathComponent("\(basename).MOV").path!
+            assetIdentifier].joined(separator: "-")
+        let tmpImagePath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(basename).tiff").path
+        let tmpMoviePath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(basename).mov").path
+        let imagePath = outputDir.appendingPathComponent("\(basename).JPG").path
+        let moviePath = outputDir.appendingPathComponent("\(basename).MOV").path
         let paths = [tmpImagePath, tmpMoviePath, imagePath, moviePath]
 
         for path in paths {
-            guard !NSFileManager.defaultManager().fileExistsAtPath(path) else { return }
+            guard !FileManager.default.fileExists(atPath: path) else { return }
         }
 
-        guard image.TIFFRepresentation?.writeToFile(tmpImagePath, atomically: true) == true else { return }
+//        guard image.TIFFRepresentation?.writeToFile(tmpImagePath, atomically: true) == true else { return }
+        guard let _ = try? image.tiffRepresentation?.write(to: URL(fileURLWithPath: tmpImagePath), options: [.atomic]) else { return }
         // create AVAssetExportSession each time because it cannot be reused after export completion
         guard let session = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetPassthrough) else { return }
         session.outputFileType = "com.apple.quicktime-movie"
-        session.outputURL = NSURL(fileURLWithPath: tmpMoviePath)
+        session.outputURL = URL(fileURLWithPath: tmpMoviePath)
         session.timeRange = CMTimeRange(start: startTime, end: endTime)
-        session.exportAsynchronouslyWithCompletionHandler {
-            dispatch_async(dispatch_get_main_queue()) {
+        session.exportAsynchronously {
+            DispatchQueue.main.async {
                 switch session.status {
-                case .Completed:
+                case .completed:
                     JPEG(path: tmpImagePath).write(imagePath, assetIdentifier: assetIdentifier)
                     NSLog("%@", "LivePhoto JPEG created: \(imagePath)")
 
                     QuickTimeMov(path: tmpMoviePath).write(moviePath, assetIdentifier: assetIdentifier)
                     NSLog("%@", "LivePhoto MOV created: \(moviePath)")
 
-                    self.showInFinderAndOpenInPhotos([imagePath, moviePath].map{NSURL(fileURLWithPath: $0)})
-                case .Cancelled, .Exporting, .Failed, .Unknown, .Waiting:
+                    self.showInFinderAndOpenInPhotos([imagePath, moviePath].map{URL(fileURLWithPath: $0)})
+                case .cancelled, .exporting, .failed, .unknown, .waiting:
                     NSLog("%@", "exportAsynchronouslyWithCompletionHandler = \(session.status)")
                 }
 
                 for path in [tmpImagePath, tmpMoviePath] {
-                    let _ = try? NSFileManager.defaultManager().removeItemAtPath(path)
+                    let _ = try? FileManager.default.removeItem(atPath: path)
                 }
                 self.exportSession = nil
                 self.updateButtons()
@@ -286,34 +287,34 @@ class LivePhotoSandboxViewController: NSViewController {
         updateButtons()
     }
 
-    private func showInFinderAndOpenInPhotos(fileURLs: [NSURL]) {
-        NSWorkspace.sharedWorkspace().activateFileViewerSelectingURLs(fileURLs)
+    fileprivate func showInFinderAndOpenInPhotos(_ fileURLs: [URL]) {
+        NSWorkspace.shared().activateFileViewerSelecting(fileURLs)
 
         // wait until Finder is active or timed out,
         // to avoid openURLs overtaking Finder activation
-        dispatch_async(dispatch_get_global_queue(0, 0)) {
-            let start = NSDate()
-            while NSWorkspace.sharedWorkspace().frontmostApplication?.bundleIdentifier != "com.apple.finder" && NSDate().timeIntervalSinceDate(start) < 5 {
-                NSThread.sleepForTimeInterval(0.1)
+        DispatchQueue.global(qos: .default).async {
+            let start = Date()
+            while NSWorkspace.shared().frontmostApplication?.bundleIdentifier != "com.apple.finder" && Date().timeIntervalSince(start) < 5 {
+                Thread.sleep(forTimeInterval: 0.1)
             }
-            NSWorkspace.sharedWorkspace().openURLs(fileURLs, withAppBundleIdentifier: "com.apple.Photos", options: [], additionalEventParamDescriptor: nil, launchIdentifiers: nil)
+            NSWorkspace.shared().open(fileURLs, withAppBundleIdentifier: "com.apple.Photos", options: [], additionalEventParamDescriptor: nil, launchIdentifiers: nil)
         }
     }
 
-    @objc private func close() {
+    @objc fileprivate func close() {
         closeAction?()
     }
 
-    @objc private func play() {
-        player.seekToTime(startTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+    @objc fileprivate func play() {
+        player.seek(to: startTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
         player.play()
     }
 
-    @objc private func pause() {
+    @objc fileprivate func pause() {
         player.pause()
     }
 
-    @objc private func playOrPause() {
+    @objc fileprivate func playOrPause() {
         if player.rate == 0 {
             play()
         } else {
@@ -321,16 +322,16 @@ class LivePhotoSandboxViewController: NSViewController {
         }
     }
 
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         switch (object, keyPath) {
         case (is AVPlayer, _):
             let stopped = (player.rate == 0)
             if stopped {
-                player.seekToTime(posterTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+                player.seek(to: posterTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
             }
             break
         default:
-            super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
 }

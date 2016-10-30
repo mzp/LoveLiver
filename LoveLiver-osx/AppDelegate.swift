@@ -15,13 +15,13 @@ import Ikemen
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    func applicationOpenUntitledFile(sender: NSApplication) -> Bool {
+    func applicationOpenUntitledFile(_ sender: NSApplication) -> Bool {
         openDocument(sender)
         return true
     }
 
-    @objc private func openDocument(sender: AnyObject?) {
-        NSDocumentController.sharedDocumentController().openDocument(sender)
+    @objc fileprivate func openDocument(_ sender: AnyObject?) {
+        NSDocumentController.shared().openDocument(sender)
     }
 }
 

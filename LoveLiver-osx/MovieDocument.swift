@@ -19,10 +19,10 @@ class MovieDocument: NSDocument, NSWindowDelegate {
     var overviewWindow: NSWindow?
     var overviewVC: MovieOverviewViewController?
 
-    override func readFromURL(url: NSURL, ofType typeName: String) throws {
+    override func read(from url: URL, ofType typeName: String) throws {
         NSLog("%@", "opening \(url)")
 
-        playerItem = AVPlayerItem(URL: url)
+        playerItem = AVPlayerItem(url: url)
         guard let playerItem = playerItem else { throw NSError(domain: "MovieDocument", code: 0, userInfo: [:]) }
         player = AVPlayer(playerItem: playerItem)
     }
@@ -39,14 +39,14 @@ class MovieDocument: NSDocument, NSWindowDelegate {
         windowControllers.forEach { wc in
             wc.showWindow(nil)
         }
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             self.waitForMovieLoaded()
         }
     }
 
-    private func waitForMovieLoaded() {
+    fileprivate func waitForMovieLoaded() {
         guard let videoSize = playerItem?.naturalSize else {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(1 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)) {
                 self.waitForMovieLoaded()
             }
             return
@@ -54,58 +54,60 @@ class MovieDocument: NSDocument, NSWindowDelegate {
         movieDidLoad(videoSize)
     }
 
-    private func movieDidLoad(videoSize: CGSize) {
+    fileprivate func movieDidLoad(_ videoSize: CGSize) {
         overviewVC = MovieOverviewViewController(player: player!, playerItem: playerItem!)
         overviewWindow = NSWindow(contentViewController: overviewVC!) ※ { w in
             w.delegate = self
             w.styleMask = NSResizableWindowMask
         }
         addWindowController(NSWindowController(window: overviewWindow))
-        mainWindow!.addChildWindow(overviewWindow!, ordered: .Above)
+        mainWindow!.addChildWindow(overviewWindow!, ordered: .above)
 
         mainVC?.movieDidLoad(videoSize)
         overviewVC?.movieDidLoad(videoSize)
         repositionOverviewWindow()
     }
 
-    private func openLivePhotoSandbox() {
+    fileprivate func openLivePhotoSandbox() {
         guard let player = player,
             let overviewContentView = overviewVC?.view,
             let overview = overviewVC?.overview else { return }
 
         let livephotoSandboxVC = LivePhotoSandboxViewController(player: player, baseFilename: fileURL?.lastPathComponent ?? "unknown")
         let popover = NSPopover()
-        livephotoSandboxVC.closeAction = {
+        livephotoSandboxVC?.closeAction = {
             popover.performClose(nil)
         }
-        popover.behavior = .Semitransient
+        popover.behavior = .semitransient
         popover.contentViewController = livephotoSandboxVC
-        popover.showRelativeToRect(overviewContentView.convertRect(overview.currentTimeBar.frame, fromView: overview), ofView: overviewContentView, preferredEdge: NSRectEdge.MinY)
+        popover.show(relativeTo: overviewContentView.convert(overview.currentTimeBar.frame, from: overview), of: overviewContentView, preferredEdge: NSRectEdge.minY)
     }
 
-    func windowDidResize(notification: NSNotification) {
-        if notification.object === mainWindow {
-            repositionOverviewWindow()
-        } else if notification.object === overviewWindow {
-            repositionMainWindow()
+    func windowDidResize(_ notification: Notification) {
+        if let object = notification.object as? NSWindow {
+            if object === mainWindow {
+                repositionOverviewWindow()
+            } else if object === overviewWindow {
+                repositionMainWindow()
+            }
         }
     }
 
-    private var metrics: [String: CGFloat] = [
+    fileprivate var metrics: [String: CGFloat] = [
         "p": 20,
     ]
 
-    private func repositionMainWindow() {
+    fileprivate func repositionMainWindow() {
         guard let mainWindow = mainWindow, let overviewWindow = overviewWindow else { return }
 
         mainWindow.removeChildWindow(overviewWindow)
         mainWindow.setFrameOrigin(NSPoint(
             x: overviewWindow.frame.origin.x - (mainWindow.frame.width - overviewWindow.frame.width) / 2,
             y: overviewWindow.frame.origin.y + overviewWindow.frame.height + metrics["p"]!))
-        mainWindow.addChildWindow(overviewWindow, ordered: .Above)
+        mainWindow.addChildWindow(overviewWindow, ordered: .above)
     }
 
-    private func repositionOverviewWindow() {
+    fileprivate func repositionOverviewWindow() {
         guard let mainWindow = mainWindow, let overviewWindow = overviewWindow else { return }
 
         overviewWindow.setFrameTopLeftPoint(NSPoint(

@@ -14,24 +14,24 @@ import Ikemen
 
 
 class MovieDocumentViewController: NSViewController {
-    private let movieURL: NSURL
-    private let player: AVPlayer
-    private let playerItem: AVPlayerItem
-    var createLivePhotoAction: (Void -> Void)?
+    fileprivate let movieURL: URL
+    fileprivate let player: AVPlayer
+    fileprivate let playerItem: AVPlayerItem
+    var createLivePhotoAction: ((Void) -> Void)?
 
-    private let playerView: AVPlayerView = AVPlayerView() ※ { v in
-        v.controlsStyle = .Floating
+    fileprivate let playerView: AVPlayerView = AVPlayerView() ※ { v in
+        v.controlsStyle = .floating
         v.showsFrameSteppingButtons = true
     }
-    private lazy var posterFrameButton: NSButton = NSButton() ※ { b in
+    fileprivate lazy var posterFrameButton: NSButton = NSButton() ※ { b in
         b.title = "Live Photo With This Frame"
-        b.setButtonType(.MomentaryLightButton)
-        b.bezelStyle = .RoundedBezelStyle
+        b.setButtonType(.momentaryLight)
+        b.bezelStyle = .rounded
         b.target = self
         b.action = #selector(self.createLivePhotoSandbox)
     }
 
-    init!(movieURL: NSURL, playerItem: AVPlayerItem, player: AVPlayer) {
+    init!(movieURL: URL, playerItem: AVPlayerItem, player: AVPlayer) {
         self.movieURL = movieURL
         self.playerItem = playerItem
         self.player = player
@@ -55,13 +55,13 @@ class MovieDocumentViewController: NSViewController {
         autolayout("V:|[player]-p-[posterButton]-p-|")
     }
 
-    func movieDidLoad(videoSize: CGSize) {
+    func movieDidLoad(_ videoSize: CGSize) {
         self.playerView.addConstraint(NSLayoutConstraint(
-            item: self.playerView, attribute: .Width, relatedBy: .Equal,
-            toItem: self.playerView, attribute: .Height, multiplier: videoSize.width / videoSize.height, constant: 0))
+            item: self.playerView, attribute: .width, relatedBy: .equal,
+            toItem: self.playerView, attribute: .height, multiplier: videoSize.width / videoSize.height, constant: 0))
     }
 
-    @objc private func createLivePhotoSandbox() {
+    @objc fileprivate func createLivePhotoSandbox() {
         player.pause()
         createLivePhotoAction?()
     }

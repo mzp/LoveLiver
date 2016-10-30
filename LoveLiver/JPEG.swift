@@ -9,46 +9,46 @@
 import Foundation
 
 class JPEG {
-    private let kFigAppleMakerNote_AssetIdentifier = "17"
-    private let path : String
+    fileprivate let kFigAppleMakerNote_AssetIdentifier = "17"
+    fileprivate let path : String
 
     init(path : String) {
         self.path = path
     }
 
     func read() -> String? {
-        guard let makerNote = metadata()?.objectForKey(kCGImagePropertyMakerAppleDictionary) as! NSDictionary? else {
+        guard let makerNote = metadata()?.object(forKey: kCGImagePropertyMakerAppleDictionary) as! NSDictionary? else {
             return nil
         }
-        return makerNote.objectForKey(kFigAppleMakerNote_AssetIdentifier) as! String?
+        return makerNote.object(forKey: kFigAppleMakerNote_AssetIdentifier) as! String?
     }
 
-    func write(dest : String, assetIdentifier : String) {
-        guard let dest = CGImageDestinationCreateWithURL(NSURL(fileURLWithPath: dest), kUTTypeJPEG, 1, nil)
+    func write(_ dest : String, assetIdentifier : String) {
+        guard let dest = CGImageDestinationCreateWithURL(URL(fileURLWithPath: dest) as CFURL, kUTTypeJPEG, 1, nil)
             else { return }
         defer { CGImageDestinationFinalize(dest) }
         guard let imageSource = self.imageSource() else { return }
         guard let metadata = self.metadata()?.mutableCopy() as! NSMutableDictionary! else { return }
 
         let makerNote = NSMutableDictionary()
-        makerNote.setObject(assetIdentifier, forKey: kFigAppleMakerNote_AssetIdentifier)
-        metadata.setObject(makerNote, forKey: kCGImagePropertyMakerAppleDictionary as String)
+        makerNote.setObject(assetIdentifier, forKey: kFigAppleMakerNote_AssetIdentifier as NSCopying)
+        metadata.setObject(makerNote, forKey: kCGImagePropertyMakerAppleDictionary as String as String as NSCopying)
         CGImageDestinationAddImageFromSource(dest, imageSource, 0, metadata)
     }
 
-    private func metadata() -> NSDictionary? {
+    fileprivate func metadata() -> NSDictionary? {
         return self.imageSource().flatMap {
             CGImageSourceCopyPropertiesAtIndex($0, 0, nil) as NSDictionary?
         }
     }
 
-    private func imageSource() ->  CGImageSourceRef? {
+    fileprivate func imageSource() ->  CGImageSource? {
         return self.data().flatMap {
-            CGImageSourceCreateWithData($0, nil)
+            CGImageSourceCreateWithData($0 as CFData, nil)
         }
     }
 
-    private func data() -> NSData? {
-        return NSData(contentsOfFile: path)
+    fileprivate func data() -> Data? {
+        return (try? Data(contentsOf: URL(fileURLWithPath: path)))
     }
 }

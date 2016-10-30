@@ -33,7 +33,7 @@ class MovieOverviewViewController: NSViewController {
         autolayout("V:|[overview]|")
     }
 
-    func movieDidLoad(videoSize: CGSize) {
+    func movieDidLoad(_ videoSize: CGSize) {
         overview.currentTime = kCMTimeZero
         overview.reload()
     }

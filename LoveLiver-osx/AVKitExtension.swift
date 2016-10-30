@@ -7,7 +7,7 @@
 //
 
 import AVFoundation
-
+import AppKit
 
 extension CMTime {
     var msS: (Int, Int, Int) {
@@ -37,18 +37,18 @@ extension CMTime {
 
 extension AVAssetImageGenerator {
     func copyImage(at time: CMTime) -> NSImage? {
-        guard let cgImage = try? copyCGImageAtTime(time, actualTime: nil) else { return nil }
-        return NSImage(CGImage: cgImage, size: CGSize(width: CGImageGetWidth(cgImage), height: CGImageGetHeight(cgImage)))
+        guard let cgImage = try? copyCGImage(at: time, actualTime: nil) else { return nil }
+        return NSImage(cgImage: cgImage, size: CGSize(width: cgImage.width, height: cgImage.height))
     }
 }
 
 
 extension AVPlayerItem {
     var naturalSize: CGSize? {
-        return asset.tracksWithMediaType(AVMediaTypeVideo).first?.naturalSize
+        return asset.tracks(withMediaType: AVMediaTypeVideo).first?.naturalSize
     }
 
     var minFrameDuration: CMTime? {
-        return asset.tracksWithMediaType(AVMediaTypeVideo).first?.minFrameDuration
+        return asset.tracks(withMediaType: AVMediaTypeVideo).first?.minFrameDuration
     }
 }

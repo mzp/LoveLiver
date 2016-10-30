@@ -11,15 +11,15 @@ import Foundation
 import AVFoundation
 
 class QuickTimeMov {
-    private let kKeyContentIdentifier =  "com.apple.quicktime.content.identifier"
-    private let kKeyStillImageTime = "com.apple.quicktime.still-image-time"
-    private let kKeySpaceQuickTimeMetadata = "mdta"
-    private let path : String
-    private let dummyTimeRange = CMTimeRangeMake(CMTimeMake(0, 1000), CMTimeMake(200, 3000))
+    fileprivate let kKeyContentIdentifier =  "com.apple.quicktime.content.identifier"
+    fileprivate let kKeyStillImageTime = "com.apple.quicktime.still-image-time"
+    fileprivate let kKeySpaceQuickTimeMetadata = "mdta"
+    fileprivate let path : String
+    fileprivate let dummyTimeRange = CMTimeRangeMake(CMTimeMake(0, 1000), CMTimeMake(200, 3000))
 
-    private lazy var asset : AVURLAsset = {
-        let url = NSURL(fileURLWithPath: self.path)
-        return AVURLAsset(URL: url)
+    fileprivate lazy var asset : AVURLAsset = {
+        let url = URL(fileURLWithPath: self.path)
+        return AVURLAsset(url: url)
     }()
 
     init(path : String) {
@@ -57,7 +57,7 @@ class QuickTimeMov {
         return nil
     }
 
-    func write(dest : String, assetIdentifier : String) {
+    func write(_ dest : String, assetIdentifier : String) {
         do {
             // --------------------------------------------------
             // reader for source video
@@ -68,12 +68,12 @@ class QuickTimeMov {
             }
             let (reader, output) = try self.reader(track,
                 settings: [kCVPixelBufferPixelFormatTypeKey as String:
-                    NSNumber(unsignedInt: kCVPixelFormatType_32BGRA)])
+                    NSNumber(value: kCVPixelFormatType_32BGRA as UInt32)])
 
             // --------------------------------------------------
             // writer for mov
             // --------------------------------------------------
-            let writer = try AVAssetWriter(URL: NSURL(fileURLWithPath: dest), fileType: AVFileTypeQuickTimeMovie)
+            let writer = try AVAssetWriter(outputURL: URL(fileURLWithPath: dest), fileType: AVFileTypeQuickTimeMovie)
             writer.metadata = [metadataFor(assetIdentifier)]
 
             // video track
@@ -81,36 +81,36 @@ class QuickTimeMov {
                 outputSettings: videoSettings(track.naturalSize))
             input.expectsMediaDataInRealTime = true
             input.transform = track.preferredTransform
-            writer.addInput(input)
+            writer.add(input)
 
             // metadata track
             let adapter = metadataAdapter()
-            writer.addInput(adapter.assetWriterInput)
+            writer.add(adapter.assetWriterInput)
 
             // --------------------------------------------------
             // creating video
             // --------------------------------------------------
             writer.startWriting()
             reader.startReading()
-            writer.startSessionAtSourceTime(kCMTimeZero)
+            writer.startSession(atSourceTime: kCMTimeZero)
 
             // write metadata track
-            adapter.appendTimedMetadataGroup(AVTimedMetadataGroup(items: [metadataForStillImageTime()],
+            adapter.append(AVTimedMetadataGroup(items: [metadataForStillImageTime()],
                 timeRange: dummyTimeRange))
 
             // write video track
-            input.requestMediaDataWhenReadyOnQueue(dispatch_queue_create("assetAudioWriterQueue", nil)) {
-                while(input.readyForMoreMediaData) {
-                    if reader.status == .Reading {
+            input.requestMediaDataWhenReady(on: DispatchQueue(label: "assetAudioWriterQueue", attributes: [])) {
+                while(input.isReadyForMoreMediaData) {
+                    if reader.status == .reading {
                         if let buffer = output.copyNextSampleBuffer() {
-                            if !input.appendSampleBuffer(buffer) {
+                            if !input.append(buffer) {
                                 print("cannot write: \(writer.error)")
                                 reader.cancelReading()
                             }
                         }
                     } else {
                         input.markAsFinished()
-                        writer.finishWritingWithCompletionHandler() {
+                        writer.finishWriting() {
                             if let e = writer.error {
                                 print("cannot write: \(e)")
                             } else {
@@ -120,8 +120,8 @@ class QuickTimeMov {
                     }
                 }
             }
-            while writer.status == .Writing {
-                NSRunLoop.currentRunLoop().runUntilDate(NSDate(timeIntervalSinceNow: 0.5))
+            while writer.status == .writing {
+                RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.5))
             }
             if let e = writer.error {
                 print("cannot write: \(e)")
@@ -131,22 +131,22 @@ class QuickTimeMov {
         }
     }
 
-    private func metadata() -> [AVMetadataItem] {
-        return asset.metadataForFormat(AVMetadataFormatQuickTimeMetadata)
+    fileprivate func metadata() -> [AVMetadataItem] {
+        return asset.metadata(forFormat: AVMetadataFormatQuickTimeMetadata)
     }
 
-    private func track(mediaType : String) -> AVAssetTrack? {
-        return asset.tracksWithMediaType(mediaType).first
+    fileprivate func track(_ mediaType : String) -> AVAssetTrack? {
+        return asset.tracks(withMediaType: mediaType).first
     }
 
-    private func reader(track : AVAssetTrack, settings: [String:AnyObject]?) throws -> (AVAssetReader, AVAssetReaderOutput) {
+    fileprivate func reader(_ track : AVAssetTrack, settings: [String:AnyObject]?) throws -> (AVAssetReader, AVAssetReaderOutput) {
         let output = AVAssetReaderTrackOutput(track: track, outputSettings: settings)
         let reader = try AVAssetReader(asset: asset)
-        reader.addOutput(output)
+        reader.add(output)
         return (reader, output)
     }
 
-    private func metadataAdapter() -> AVAssetWriterInputMetadataAdaptor {
+    fileprivate func metadataAdapter() -> AVAssetWriterInputMetadataAdaptor {
         let spec : NSDictionary = [
             kCMMetadataFormatDescriptionMetadataSpecificationKey_Identifier as NSString:
             "\(kKeySpaceQuickTimeMetadata)/\(kKeyStillImageTime)",
@@ -154,34 +154,34 @@ class QuickTimeMov {
             "com.apple.metadata.datatype.int8"            ]
 
         var desc : CMFormatDescription? = nil
-        CMMetadataFormatDescriptionCreateWithMetadataSpecifications(kCFAllocatorDefault, kCMMetadataFormatType_Boxed, [spec], &desc)
+        CMMetadataFormatDescriptionCreateWithMetadataSpecifications(kCFAllocatorDefault, kCMMetadataFormatType_Boxed, [spec] as CFArray, &desc)
         let input = AVAssetWriterInput(mediaType: AVMediaTypeMetadata,
             outputSettings: nil, sourceFormatHint: desc)
         return AVAssetWriterInputMetadataAdaptor(assetWriterInput: input)
     }
 
-    private func videoSettings(size : CGSize) -> [String:AnyObject] {
+    fileprivate func videoSettings(_ size : CGSize) -> [String:AnyObject] {
         return [
-            AVVideoCodecKey: AVVideoCodecH264,
-            AVVideoWidthKey: size.width,
-            AVVideoHeightKey: size.height
+            AVVideoCodecKey: AVVideoCodecH264 as AnyObject,
+            AVVideoWidthKey: size.width as AnyObject,
+            AVVideoHeightKey: size.height as AnyObject
         ]
     }
 
-    private func metadataFor(assetIdentifier: String) -> AVMetadataItem {
+    fileprivate func metadataFor(_ assetIdentifier: String) -> AVMetadataItem {
         let item = AVMutableMetadataItem()
-        item.key = kKeyContentIdentifier
+        item.key = kKeyContentIdentifier as (NSCopying & NSObjectProtocol)?
         item.keySpace = kKeySpaceQuickTimeMetadata
-        item.value = assetIdentifier
+        item.value = assetIdentifier as (NSCopying & NSObjectProtocol)?
         item.dataType = "com.apple.metadata.datatype.UTF-8"
         return item
     }
 
-    private func metadataForStillImageTime() -> AVMetadataItem {
+    fileprivate func metadataForStillImageTime() -> AVMetadataItem {
         let item = AVMutableMetadataItem()
-        item.key = kKeyStillImageTime
+        item.key = kKeyStillImageTime as (NSCopying & NSObjectProtocol)?
         item.keySpace = kKeySpaceQuickTimeMetadata
-        item.value = 0
+        item.value = 0 as (NSCopying & NSObjectProtocol)?
         item.dataType = "com.apple.metadata.datatype.int8"
         return item
     }
