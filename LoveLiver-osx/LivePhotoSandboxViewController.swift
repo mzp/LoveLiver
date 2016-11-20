@@ -176,11 +176,11 @@ class LivePhotoSandboxViewController: NSViewController {
             "spacerRR": NSView(),
             ])
         autolayout("H:|-p-[close]-(>=p)-[export]-p-|")
-        autolayout("H:|-p-[player(>=300)]-p-|")
+        autolayout("H:|-p-[player]-p-|")
         autolayout("H:|-p-[startFrame]-(>=p)-[endFrame(==startFrame)]-p-|")
         autolayout("H:|-p-[startLabel][spacerLL][beforePosterLabel][spacerLR(==spacerLL)][posterLabel][spacerRL(==spacerLL)][afterPosterLabel][spacerRR(==spacerLL)][endLabel]-p-|")
         autolayout("H:|-p-[overview]-p-|")
-        autolayout("V:|-p-[export]-p-[player(>=300)]")
+        autolayout("V:|-p-[export]-p-[player]")
         autolayout("V:|-p-[close]-p-[player]")
         autolayout("V:[player][overview(==64)]")
         autolayout("V:[overview]-p-[startFrame(==128)][startLabel]-p-|")
