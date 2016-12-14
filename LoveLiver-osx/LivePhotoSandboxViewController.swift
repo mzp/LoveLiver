@@ -16,6 +16,9 @@ import Ikemen
 private let livePhotoDuration: TimeInterval = 3
 private let outputDir = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Pictures/LoveLiver")
 
+fileprivate extension NSTouchBarItemIdentifier {
+    static let overview = NSTouchBarItemIdentifier("jp.mzp.loveliver.overview")
+}
 
 private func label() -> NSTextField {
     return NSTextField() ※ { tf in
@@ -27,8 +30,7 @@ private func label() -> NSTextField {
     }
 }
 
-
-class LivePhotoSandboxViewController: NSViewController {
+class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
     fileprivate let baseFilename: String
     fileprivate lazy var exportButton: NSButton = NSButton() ※ { b in
         b.bezelStyle = .regularSquare
@@ -88,6 +90,23 @@ class LivePhotoSandboxViewController: NSViewController {
             updateScope()
         }
     }
+
+    private var trimRange = CMTimeRange() {
+        didSet {
+            overview.trimRange = trimRange
+            touchBarController.trimRange = trimRange
+        }
+    }
+
+    private var scopeRange = CMTimeRange() {
+        didSet {
+            overview.scopeRange = scopeRange
+            touchBarController.scopeRange = scopeRange
+        }
+    }
+
+    private let touchBarController : TouchBarController
+
     fileprivate let startLabel = label()
     fileprivate let beforePosterLabel = label()
     fileprivate let posterLabel = label()
@@ -105,12 +124,12 @@ class LivePhotoSandboxViewController: NSViewController {
 
         if CMTimeMaximum(kCMTimeZero, startTime) == kCMTimeZero {
             // scope is clipped by zero. underflow scope start by subtracting from end
-            overview.scopeRange = CMTimeRange(start: CMTimeSubtract(endTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale)), end: endTime)
+            scopeRange = CMTimeRange(start: CMTimeSubtract(endTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale)), end: endTime)
         } else if CMTimeMinimum(duration, endTime) == duration {
             // scope is clipped by movie end. overflow scope end by adding to start
-            overview.scopeRange = CMTimeRange(start: startTime, end: CMTimeAdd(startTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale)))
+            scopeRange = CMTimeRange(start: startTime, end: CMTimeAdd(startTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale)))
         } else {
-            overview.scopeRange = CMTimeRange(start: startTime, end: endTime)
+            scopeRange = CMTimeRange(start: startTime, end: endTime)
         }
     }
 
@@ -136,6 +155,8 @@ class LivePhotoSandboxViewController: NSViewController {
         overview = MovieOverviewControl(player: self.player, playerItem: item)
         overview.draggingMode = .scope
         overview.imageGeneratorTolerance = kCMTimeZero
+
+        touchBarController = TouchBarController(player: self.player, playerItem: item)
 
         super.init(nibName: nil, bundle: nil)
 
@@ -196,6 +217,13 @@ class LivePhotoSandboxViewController: NSViewController {
             startFrameView.addConstraint(NSLayoutConstraint(item: startFrameView, attribute: .width, relatedBy: .equal, toItem: startFrameView, attribute: .height, multiplier: videoSize.width / videoSize.height, constant: 0))
         }
 
+        if #available(OSX 10.12.2, *) {
+            touchBar = NSTouchBar() ※ { bar in
+                bar.defaultItemIdentifiers = [.overview]
+                bar.delegate = self
+            }
+        }
+
         updateLabels()
         updateImages()
     }
@@ -205,13 +233,20 @@ class LivePhotoSandboxViewController: NSViewController {
 
         let trimStart = CMTimeSubtract(posterTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale))
         let trimEnd = CMTimeAdd(posterTime, CMTime(seconds: livePhotoDuration, preferredTimescale: posterTime.timescale))
-        overview.trimRange = CMTimeRange(start: trimStart, end: trimEnd)
-        overview.shouldUpdateScopeRange = {[weak self] scopeRange in
-            guard let `self` = self,
-                let scopeRange = scopeRange else { return false }
-            return CMTimeRangeContainsTime(scopeRange, self.posterTime)
+        trimRange = CMTimeRange(start: trimStart, end: trimEnd)
+
+        overview.shouldUpdateScopeRange = shouldUpdateScopeRange
+        overview.onScopeChange = {[weak self] in
+            guard let `self` = self else { return }
+            self.onScopeChange(self.overview)
         }
-        overview.onScopeChange = {[weak self] dragging in self?.onScopeChange(dragging)}
+
+        touchBarController.shouldUpdateScopeRange = shouldUpdateScopeRange
+        touchBarController.onScopeChange = {[weak self] (overview) in
+            guard let `self` = self else { return }
+            self.onScopeChange(overview)
+        }
+
         updateScope()
 
         // hook playerView click
@@ -219,13 +254,13 @@ class LivePhotoSandboxViewController: NSViewController {
         playerView.addGestureRecognizer(playerViewClickGesture)
     }
 
-    func onScopeChange(_ dragging: Bool) {
+    func onScopeChange(_ overview : MovieOverviewControl) {
         guard let s = overview.scopeRange?.start,
             let e = overview.scopeRange?.end else { return }
         startTime = CMTimeMaximum(kCMTimeZero, s)
         endTime = CMTimeMinimum(player.currentItem?.duration ?? kCMTimeZero, e)
 
-        if !dragging {
+        if !(touchBarController.dragging || self.overview.dragging) {
             updateImages()
         }
     }
@@ -301,6 +336,11 @@ class LivePhotoSandboxViewController: NSViewController {
         }
     }
 
+    private func shouldUpdateScopeRange(scopeRange : CMTimeRange?) -> Bool {
+        guard let scopeRange = scopeRange else { return false }
+        return CMTimeRangeContainsTime(scopeRange, self.posterTime)
+    }
+
     @objc fileprivate func close() {
         closeAction?()
     }
@@ -332,6 +372,17 @@ class LivePhotoSandboxViewController: NSViewController {
             break
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        }
+    }
+
+    @available(OSX 10.12.2, *)
+    func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem? {
+        if identifier == .overview {
+            return NSCustomTouchBarItem(identifier: identifier) ※ { item in
+                item.viewController = touchBarController
+            }
+        } else {
+            return nil
         }
     }
 }

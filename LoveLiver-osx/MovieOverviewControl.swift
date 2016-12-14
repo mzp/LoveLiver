@@ -11,10 +11,6 @@ import AVFoundation
 import Ikemen
 import NorthLayout
 
-
-private let overviewHeight: CGFloat = 64
-
-
 class MovieOverviewControl: NSView {
     let player: AVPlayer
     var playerTimeObserver: AnyObject?
@@ -50,11 +46,17 @@ class MovieOverviewControl: NSView {
                 return
             }
             updateScope()
-            onScopeChange?(mouseDownLocation != nil)
+            onScopeChange?()
         }
     }
+
+    var dragging : Bool {
+        return mouseDownLocation != nil
+    }
+
+
     var shouldUpdateScopeRange: ((_ newValue: CMTimeRange?) -> Bool)?
-    var onScopeChange: ((_ dragging: Bool) -> Void)?
+    var onScopeChange: (() -> Void)?
     fileprivate lazy var scopeMaskLeftView: NSView = NSView(frame: NSZeroRect) ※ { v in
         v.wantsLayer = true
         v.layer?.backgroundColor = NSColor(white: 0, alpha: 0.75).cgColor
@@ -105,10 +107,6 @@ class MovieOverviewControl: NSView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override var intrinsicContentSize: NSSize {
-        return CGSize(width: NSViewNoIntrinsicMetric, height: overviewHeight)
-    }
-
     func reload() {
         imageGenerator?.cancelAllCGImageGeneration()
         imageGenerator = nil
@@ -118,6 +116,11 @@ class MovieOverviewControl: NSView {
             let videoSize = item.naturalSize else {
                 numberOfPages = 0
                 return
+        }
+
+        if bounds.height == 0 {
+            numberOfPages = 0
+            return
         }
 
         // each page preserves aspect ratio of video and varies number of pages so that fill self.bounds.width
@@ -146,6 +149,7 @@ class MovieOverviewControl: NSView {
                 self.setNeedsDisplay(self.bounds)
             }
         }
+        updateScope()
     }
 
     func observePlayer() {
@@ -251,7 +255,7 @@ class MovieOverviewControl: NSView {
         switch draggingMode {
         case .seek: break
         case .scope:
-            onScopeChange?(false)
+            onScopeChange?()
             updateForwardPlaybackEndTime()
         }
     }
