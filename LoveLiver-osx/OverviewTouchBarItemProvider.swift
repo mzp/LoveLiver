@@ -23,6 +23,7 @@ protocol OverviewTouchBarItemProviderType : class {
     func makeTouchbarItem(identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem
 }
 
+@available(OSX 10.12.2, *)
 class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProviderType {
     var shouldUpdateScopeRange: ((_ newValue: CMTimeRange?) -> Bool)?
     var onScopeChange: ((_ overview : MovieOverviewControl) -> Void)?
@@ -52,10 +53,10 @@ class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProvi
         fatalError("init(coder:) has not been implemented")
     }
 
-    @available(OSX 10.12.2, *)
+
     func makeTouchbarItem(identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem {
         return NSCustomTouchBarItem(identifier: identifier) ※ { item in
-                item.viewController = self
+            item.viewController = self
         }
     }
 
@@ -73,12 +74,11 @@ class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProvi
     }
 
     override func touchesBegan(with theEvent: NSEvent) {
-        if #available(OSX 10.12.2, *) {
-            if let touch = theEvent.touches(matching: .began, in: view).first, touch.type == .direct {
-                dragging = true
-                seekToTouchPosition(touch)
-            }
+        if let touch = theEvent.touches(matching: .began, in: view).first, touch.type == .direct {
+            dragging = true
+            seekToTouchPosition(touch)
         }
+
     }
 
     override func touchesMoved(with theEvent: NSEvent) {
@@ -95,23 +95,21 @@ class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProvi
     }
 
     private func seekToTouchPosition(_ touch: NSTouch) {
-        if #available(OSX 10.12.2, *) {
-            let trimRange = overview.trimRange
-            let duration = overview.scopeRange?.duration ?? kCMTimeZero
+        let trimRange = overview.trimRange
+        let duration = overview.scopeRange?.duration ?? kCMTimeZero
 
-            let p = view.convert(touch.location(in: view), from: nil)
+        let p = view.convert(touch.location(in: view), from: nil)
 
-            let touchTime = CMTimeAdd(trimRange.start, CMTime(value: Int64(CGFloat(trimRange.duration.value) * p.x / view.bounds.width), timescale: trimRange.duration.timescale))
-            let maxStart = CMTimeSubtract(trimRange.end, duration)
-            let start = CMTimeMinimum(touchTime, maxStart)
+        let touchTime = CMTimeAdd(trimRange.start, CMTime(value: Int64(CGFloat(trimRange.duration.value) * p.x / view.bounds.width), timescale: trimRange.duration.timescale))
+        let maxStart = CMTimeSubtract(trimRange.end, duration)
+        let start = CMTimeMinimum(touchTime, maxStart)
 
-            let end = CMTimeAdd(start, duration)
-            let newScopeRange = CMTimeRange(start: start, end: end)
+        let end = CMTimeAdd(start, duration)
+        let newScopeRange = CMTimeRange(start: start, end: end)
 
-            if shouldUpdateScopeRange?(newScopeRange) == true {
-                overview.scopeRange = newScopeRange
-                onScopeChange?(overview)
-            }
+        if shouldUpdateScopeRange?(newScopeRange) == true {
+            overview.scopeRange = newScopeRange
+            onScopeChange?(overview)
         }
     }
 }

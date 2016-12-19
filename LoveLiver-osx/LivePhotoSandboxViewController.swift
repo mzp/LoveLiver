@@ -156,7 +156,11 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
         overview.draggingMode = .scope
         overview.imageGeneratorTolerance = kCMTimeZero
 
-        touchBarItemProvider = OverviewTouchBarItemProvider(player: self.player, playerItem: item)
+        if #available(OSX 10.12.2, *) {
+            touchBarItemProvider = OverviewTouchBarItemProvider(player: self.player, playerItem: item)
+        } else {
+            touchBarItemProvider = nil
+        }
 
         super.init(nibName: nil, bundle: nil)
 
