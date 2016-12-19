@@ -10,8 +10,9 @@ import Foundation
 import Cocoa
 import AVFoundation
 import NorthLayout
+import Ikemen
 
-class TouchBarController : NSViewController {
+class OverviewTouchBarItemProvider : NSViewController {
     var shouldUpdateScopeRange: ((_ newValue: CMTimeRange?) -> Bool)?
     var onScopeChange: ((_ overview : MovieOverviewControl) -> Void)?
     var trimRange : CMTimeRange = kCMTimeRangeZero {
@@ -38,6 +39,13 @@ class TouchBarController : NSViewController {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    @available(OSX 10.12.2, *)
+    func makeTouchbarItem(identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem {
+        return NSCustomTouchBarItem(identifier: identifier) ※ { item in
+                item.viewController = self
+        }
     }
 
     override func loadView() {
