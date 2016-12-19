@@ -105,7 +105,7 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
         }
     }
 
-    private let touchBarItemProvider : OverviewTouchBarItemProvider?
+    private let touchBarItemProvider : OverviewTouchBarItemProviderType?
 
     fileprivate let startLabel = label()
     fileprivate let beforePosterLabel = label()

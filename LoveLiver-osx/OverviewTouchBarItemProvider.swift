@@ -12,7 +12,18 @@ import AVFoundation
 import NorthLayout
 import Ikemen
 
-class OverviewTouchBarItemProvider : NSViewController {
+protocol OverviewTouchBarItemProviderType : class {
+    var shouldUpdateScopeRange: ((_ newValue: CMTimeRange?) -> Bool)? { get set }
+    var onScopeChange: ((_ overview : MovieOverviewControl) -> Void)? { get set }
+    var trimRange : CMTimeRange { get set }
+    var scopeRange : CMTimeRange { get set }
+    var dragging : Bool { get }
+
+    @available(OSX 10.12.2, *)
+    func makeTouchbarItem(identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem
+}
+
+class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProviderType {
     var shouldUpdateScopeRange: ((_ newValue: CMTimeRange?) -> Bool)?
     var onScopeChange: ((_ overview : MovieOverviewControl) -> Void)?
     var trimRange : CMTimeRange = kCMTimeRangeZero {
