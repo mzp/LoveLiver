@@ -94,18 +94,18 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
     private var trimRange = CMTimeRange() {
         didSet {
             overview.trimRange = trimRange
-            touchBarController.trimRange = trimRange
+            touchBarController?.trimRange = trimRange
         }
     }
 
     private var scopeRange = CMTimeRange() {
         didSet {
             overview.scopeRange = scopeRange
-            touchBarController.scopeRange = scopeRange
+            touchBarController?.scopeRange = scopeRange
         }
     }
 
-    private let touchBarController : TouchBarController
+    private let touchBarController : TouchBarController?
 
     fileprivate let startLabel = label()
     fileprivate let beforePosterLabel = label()
@@ -241,8 +241,8 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
             self.onScopeChange(self.overview)
         }
 
-        touchBarController.shouldUpdateScopeRange = shouldUpdateScopeRange
-        touchBarController.onScopeChange = {[weak self] (overview) in
+        touchBarController?.shouldUpdateScopeRange = shouldUpdateScopeRange
+        touchBarController?.onScopeChange = {[weak self] (overview) in
             guard let `self` = self else { return }
             self.onScopeChange(overview)
         }
@@ -260,7 +260,7 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
         startTime = CMTimeMaximum(kCMTimeZero, s)
         endTime = CMTimeMinimum(player.currentItem?.duration ?? kCMTimeZero, e)
 
-        if !(touchBarController.dragging || self.overview.dragging) {
+        if !((touchBarController?.dragging ?? false) || self.overview.dragging) {
             updateImages()
         }
     }
