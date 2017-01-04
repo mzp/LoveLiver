@@ -94,18 +94,18 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
     private var trimRange = CMTimeRange() {
         didSet {
             overview.trimRange = trimRange
-            touchBarController.trimRange = trimRange
+            touchBarItemProvider?.trimRange = trimRange
         }
     }
 
     private var scopeRange = CMTimeRange() {
         didSet {
             overview.scopeRange = scopeRange
-            touchBarController.scopeRange = scopeRange
+            touchBarItemProvider?.scopeRange = scopeRange
         }
     }
 
-    private let touchBarController : TouchBarController
+    private let touchBarItemProvider : OverviewTouchBarItemProviderType?
 
     fileprivate let startLabel = label()
     fileprivate let beforePosterLabel = label()
@@ -156,7 +156,11 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
         overview.draggingMode = .scope
         overview.imageGeneratorTolerance = kCMTimeZero
 
-        touchBarController = TouchBarController(player: self.player, playerItem: item)
+        if #available(OSX 10.12.2, *) {
+            touchBarItemProvider = OverviewTouchBarItemProvider(player: self.player, playerItem: item)
+        } else {
+            touchBarItemProvider = nil
+        }
 
         super.init(nibName: nil, bundle: nil)
 
@@ -241,8 +245,8 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
             self.onScopeChange(self.overview)
         }
 
-        touchBarController.shouldUpdateScopeRange = shouldUpdateScopeRange
-        touchBarController.onScopeChange = {[weak self] (overview) in
+        touchBarItemProvider?.shouldUpdateScopeRange = shouldUpdateScopeRange
+        touchBarItemProvider?.onScopeChange = {[weak self] (overview) in
             guard let `self` = self else { return }
             self.onScopeChange(overview)
         }
@@ -260,7 +264,7 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
         startTime = CMTimeMaximum(kCMTimeZero, s)
         endTime = CMTimeMinimum(player.currentItem?.duration ?? kCMTimeZero, e)
 
-        if !(touchBarController.dragging || self.overview.dragging) {
+        if !((touchBarItemProvider?.dragging ?? false) || self.overview.dragging) {
             updateImages()
         }
     }
@@ -378,9 +382,7 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
     @available(OSX 10.12.2, *)
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem? {
         if identifier == .overview {
-            return NSCustomTouchBarItem(identifier: identifier) ※ { item in
-                item.viewController = touchBarController
-            }
+            return touchBarItemProvider?.makeTouchbarItem(identifier: identifier)
         } else {
             return nil
         }

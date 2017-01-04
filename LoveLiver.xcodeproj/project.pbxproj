@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		13277FE71DFCD183001AED4B /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13277FE61DFCD183001AED4B /* TouchBarController.swift */; };
+		13277FE71DFCD183001AED4B /* OverviewTouchBarItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13277FE61DFCD183001AED4B /* OverviewTouchBarItemProvider.swift */; };
 		C2C41F0CC51A39D97981D73D /* Pods_LoveLiver_osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */; };
 		EA27F5EF1C98426A00C23F40 /* MovieOverviewControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */; };
 		EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379AB81C68DE6D00106AEF /* AppDelegate.swift */; };
@@ -23,7 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		13277FE61DFCD183001AED4B /* TouchBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
+		13277FE61DFCD183001AED4B /* OverviewTouchBarItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverviewTouchBarItemProvider.swift; sourceTree = "<group>"; };
 		133DFE3A1BC8C69900902407 /* JPEG.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JPEG.swift; sourceTree = "<group>"; };
 		133DFE3C1BC8C6EF00902407 /* QuickTimeMov.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickTimeMov.swift; sourceTree = "<group>"; };
 		3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LoveLiver_osx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,7 +108,7 @@
 				EA88135E1C9ED065000CE151 /* MovieOverviewViewController.swift */,
 				EA6D28881C9EF49200F06E79 /* LivePhotoSandboxViewController.swift */,
 				EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */,
-				13277FE61DFCD183001AED4B /* TouchBarController.swift */,
+				13277FE61DFCD183001AED4B /* OverviewTouchBarItemProvider.swift */,
 				EA6D28861C9EF0FD00F06E79 /* AVKitExtension.swift */,
 				EA379ABA1C68DE6D00106AEF /* Assets.xcassets */,
 				EA379ABC1C68DE6D00106AEF /* MainMenu.xib */,
@@ -247,7 +247,7 @@
 				EA27F5EF1C98426A00C23F40 /* MovieOverviewControl.swift in Sources */,
 				EA379ADD1C6A2E8800106AEF /* MovieDocumentViewController.swift in Sources */,
 				EA88135F1C9ED065000CE151 /* MovieOverviewViewController.swift in Sources */,
-				13277FE71DFCD183001AED4B /* TouchBarController.swift in Sources */,
+				13277FE71DFCD183001AED4B /* OverviewTouchBarItemProvider.swift in Sources */,
 				EA379ADE1C6A33A500106AEF /* JPEG.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

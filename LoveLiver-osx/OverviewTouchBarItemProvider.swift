@@ -10,8 +10,21 @@ import Foundation
 import Cocoa
 import AVFoundation
 import NorthLayout
+import Ikemen
 
-class TouchBarController : NSViewController {
+protocol OverviewTouchBarItemProviderType : class {
+    var shouldUpdateScopeRange: ((_ newValue: CMTimeRange?) -> Bool)? { get set }
+    var onScopeChange: ((_ overview : MovieOverviewControl) -> Void)? { get set }
+    var trimRange : CMTimeRange { get set }
+    var scopeRange : CMTimeRange { get set }
+    var dragging : Bool { get }
+
+    @available(OSX 10.12.2, *)
+    func makeTouchbarItem(identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem
+}
+
+@available(OSX 10.12.2, *)
+class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProviderType {
     var shouldUpdateScopeRange: ((_ newValue: CMTimeRange?) -> Bool)?
     var onScopeChange: ((_ overview : MovieOverviewControl) -> Void)?
     var trimRange : CMTimeRange = kCMTimeRangeZero {
@@ -40,6 +53,13 @@ class TouchBarController : NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+
+    func makeTouchbarItem(identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem {
+        return NSCustomTouchBarItem(identifier: identifier) ※ { item in
+            item.viewController = self
+        }
+    }
+
     override func loadView() {
         self.view = NSView()
         let autolayout = view.northLayoutFormat([:], [
@@ -54,12 +74,11 @@ class TouchBarController : NSViewController {
     }
 
     override func touchesBegan(with theEvent: NSEvent) {
-        if #available(OSX 10.12.2, *) {
-            if let touch = theEvent.touches(matching: .began, in: view).first, touch.type == .direct {
-                dragging = true
-                seekToTouchPosition(touch)
-            }
+        if let touch = theEvent.touches(matching: .began, in: view).first, touch.type == .direct {
+            dragging = true
+            seekToTouchPosition(touch)
         }
+
     }
 
     override func touchesMoved(with theEvent: NSEvent) {
@@ -76,23 +95,21 @@ class TouchBarController : NSViewController {
     }
 
     private func seekToTouchPosition(_ touch: NSTouch) {
-        if #available(OSX 10.12.2, *) {
-            let trimRange = overview.trimRange
-            let duration = overview.scopeRange?.duration ?? kCMTimeZero
+        let trimRange = overview.trimRange
+        let duration = overview.scopeRange?.duration ?? kCMTimeZero
 
-            let p = view.convert(touch.location(in: view), from: nil)
+        let p = view.convert(touch.location(in: view), from: nil)
 
-            let touchTime = CMTimeAdd(trimRange.start, CMTime(value: Int64(CGFloat(trimRange.duration.value) * p.x / view.bounds.width), timescale: trimRange.duration.timescale))
-            let maxStart = CMTimeSubtract(trimRange.end, duration)
-            let start = CMTimeMinimum(touchTime, maxStart)
+        let touchTime = CMTimeAdd(trimRange.start, CMTime(value: Int64(CGFloat(trimRange.duration.value) * p.x / view.bounds.width), timescale: trimRange.duration.timescale))
+        let maxStart = CMTimeSubtract(trimRange.end, duration)
+        let start = CMTimeMinimum(touchTime, maxStart)
 
-            let end = CMTimeAdd(start, duration)
-            let newScopeRange = CMTimeRange(start: start, end: end)
+        let end = CMTimeAdd(start, duration)
+        let newScopeRange = CMTimeRange(start: start, end: end)
 
-            if shouldUpdateScopeRange?(newScopeRange) == true {
-                overview.scopeRange = newScopeRange
-                onScopeChange?(overview)
-            }
+        if shouldUpdateScopeRange?(newScopeRange) == true {
+            overview.scopeRange = newScopeRange
+            onScopeChange?(overview)
         }
     }
 }
