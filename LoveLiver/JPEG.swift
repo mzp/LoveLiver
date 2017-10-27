@@ -33,6 +33,9 @@ class JPEG {
         let makerNote = NSMutableDictionary()
         makerNote.setObject(assetIdentifier, forKey: kFigAppleMakerNote_AssetIdentifier as NSCopying)
         metadata.setObject(makerNote, forKey: kCGImagePropertyMakerAppleDictionary as String as String as NSCopying)
+        let exifVersion = NSMutableDictionary()
+        exifVersion.setObject([2,2,1], forKey: kCGImagePropertyExifVersion as String as NSCopying)
+        metadata.setObject(exifVersion, forKey: kCGImagePropertyExifDictionary as String as NSCopying)
         CGImageDestinationAddImageFromSource(dest, imageSource, 0, metadata)
     }
 
