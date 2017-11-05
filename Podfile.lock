@@ -1,15 +1,15 @@
 PODS:
   - NorthLayout (3.0.0)
-  - "※ikemen (0.2.0)"
+  - ※ikemen (0.2.0)
 
 DEPENDENCIES:
   - NorthLayout
-  - "※ikemen"
+  - ※ikemen
 
 SPEC CHECKSUMS:
   NorthLayout: 28db8bfa49b861b4e972cc8e7c683c8ba819ff88
-  "※ikemen": c04aecee4293a2b6deb2119f7e67e7a82c6dea06
+  ※ikemen: c04aecee4293a2b6deb2119f7e67e7a82c6dea06
 
 PODFILE CHECKSUM: 8f7e2e0c449e19a45b4f4bb0d60e9a078496f69f
 
-COCOAPODS: 1.1.1
+COCOAPODS: 1.3.1
