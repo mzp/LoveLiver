@@ -129,7 +129,6 @@
 				EA379AB31C68DE6D00106AEF /* Frameworks */,
 				EA379AB41C68DE6D00106AEF /* Resources */,
 				B6AC598A4BA044ACC8349FBC /* [CP] Embed Pods Frameworks */,
-				2E4D54806FC3D28A38335C53 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -187,21 +186,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2E4D54806FC3D28A38335C53 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		84A9B9667A59E6E73A3C7C91 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
