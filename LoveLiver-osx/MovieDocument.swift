@@ -45,7 +45,7 @@ class MovieDocument: NSDocument, NSWindowDelegate {
     }
 
     fileprivate func waitForMovieLoaded() {
-        guard let videoSize = playerItem?.naturalSize else {
+        guard let videoSize = playerItem?.naturalSize, playerItem?.duration.isIndefinite == false else {
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(1 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)) {
                 self.waitForMovieLoaded()
             }
