@@ -58,76 +58,20 @@ class QuickTimeMov {
     }
 
     func write(_ dest : String, assetIdentifier : String) {
-        do {
-            // --------------------------------------------------
-            // reader for source video
-            // --------------------------------------------------
-            guard let track = self.track(AVMediaTypeVideo) else {
-                print("not found video track")
-                return
-            }
-            let (reader, output) = try self.reader(track,
-                settings: [kCVPixelBufferPixelFormatTypeKey as String:
-                    NSNumber(value: kCVPixelFormatType_32BGRA as UInt32)])
-
-            // --------------------------------------------------
-            // writer for mov
-            // --------------------------------------------------
-            let writer = try AVAssetWriter(outputURL: URL(fileURLWithPath: dest), fileType: AVFileTypeQuickTimeMovie)
-            writer.metadata = [metadataFor(assetIdentifier)]
-
-            // video track
-            let input = AVAssetWriterInput(mediaType: AVMediaTypeVideo,
-                outputSettings: videoSettings(track.naturalSize))
-            input.expectsMediaDataInRealTime = true
-            input.transform = track.preferredTransform
-            writer.add(input)
-
-            // metadata track
-            let adapter = metadataAdapter()
-            writer.add(adapter.assetWriterInput)
-
-            // --------------------------------------------------
-            // creating video
-            // --------------------------------------------------
-            writer.startWriting()
-            reader.startReading()
-            writer.startSession(atSourceTime: kCMTimeZero)
-
-            // write metadata track
-            adapter.append(AVTimedMetadataGroup(items: [metadataForStillImageTime()],
-                timeRange: dummyTimeRange))
-
-            // write video track
-            input.requestMediaDataWhenReady(on: DispatchQueue(label: "assetAudioWriterQueue", attributes: [])) {
-                while(input.isReadyForMoreMediaData) {
-                    if reader.status == .reading {
-                        if let buffer = output.copyNextSampleBuffer() {
-                            if !input.append(buffer) {
-                                print("cannot write: \(writer.error)")
-                                reader.cancelReading()
-                            }
-                        }
-                    } else {
-                        input.markAsFinished()
-                        writer.finishWriting() {
-                            if let e = writer.error {
-                                print("cannot write: \(e)")
-                            } else {
-                                print("finish writing.")
-                            }
-                        }
-                    }
-                }
-            }
-            while writer.status == .writing {
-                RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.5))
-            }
-            if let e = writer.error {
-                print("cannot write: \(e)")
-            }
-        } catch {
-            print("error")
+        guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetPassthrough) else {
+            print("cannot read asset: \(asset.debugDescription)")
+            return
+        }
+        exportSession.outputURL = URL(fileURLWithPath: dest)
+        exportSession.outputFileType = AVFileTypeQuickTimeMovie
+        exportSession.metadata = [metadataFor(assetIdentifier), metadataForStillImageTime()]
+        exportSession.exportAsynchronously {
+        }
+        while exportSession.status == .exporting || exportSession.status == .waiting {
+            RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.5))
+        }
+        if let e = exportSession.error {
+            print("cannot write: \(e)")
         }
     }
 
