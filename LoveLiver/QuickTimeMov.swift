@@ -78,7 +78,7 @@ class QuickTimeMov {
 
             // video track
             let input = AVAssetWriterInput(mediaType: AVMediaTypeVideo,
-                outputSettings: videoSettings(track.naturalSize))
+                outputSettings: videoSettings(track.naturalSize, bitrate: track.estimatedDataRate))
             input.expectsMediaDataInRealTime = true
             input.transform = track.preferredTransform
             writer.add(input)
@@ -160,8 +160,9 @@ class QuickTimeMov {
         return AVAssetWriterInputMetadataAdaptor(assetWriterInput: input)
     }
 
-    fileprivate func videoSettings(_ size : CGSize) -> [String:AnyObject] {
+    fileprivate func videoSettings(_ size : CGSize, bitrate: Float) -> [String:AnyObject] {
         return [
+            AVVideoCompressionPropertiesKey: [AVVideoAverageBitRateKey:bitrate] as AnyObject,
             AVVideoCodecKey: AVVideoCodecH264 as AnyObject,
             AVVideoWidthKey: size.width as AnyObject,
             AVVideoHeightKey: size.height as AnyObject
