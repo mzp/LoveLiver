@@ -311,7 +311,33 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
                     QuickTimeMov(path: tmpMoviePath).write(moviePath, assetIdentifier: assetIdentifier)
                     NSLog("%@", "LivePhoto MOV created: \(moviePath)")
 
-                    self.showInFinderAndOpenInPhotos([imagePath, moviePath].map{URL(fileURLWithPath: $0)})
+                    let watchface = Watchface(
+                        metadata: .init(),
+                        face: .init(),
+                        snapshot: Data(),
+                        no_borders_snapshot: Data(),
+                        device_border_snapshot: Data(),
+                        resources: .init(
+                            images: .init(imageList: [.init(
+                                topAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
+                                leftAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
+                                bottomAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
+                                rightAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
+                                imageURL: URL(fileURLWithPath: imagePath).lastPathComponent,
+                                irisVideoURL: URL(fileURLWithPath: moviePath).lastPathComponent,
+                                originalCropH: 480,
+                                originalCropW: 384,
+                                originalCropX: 0,
+                                originalCropY: 0)]),
+                            livePhotos: [(mov: QuickTimeMov(path: tmpMoviePath), jpeg: JPEG(path: tmpImagePath), assetIdentifier: assetIdentifier)]))
+                    let tmpWatchfaceDataDir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(basename)-watchface-tmp")
+                    let watchfaceURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(basename).watchface")
+                    try! FileManager.default.createDirectory(atPath: tmpWatchfaceDataDir.path, withIntermediateDirectories: true, attributes: nil)
+                    try! watchface.fileWrapper(tmpDir: tmpWatchfaceDataDir).write(to: watchfaceURL, options: .atomic, originalContentsURL: nil)
+                    try! FileManager.default.removeItem(at: tmpWatchfaceDataDir)
+                    NSWorkspace.shared.activateFileViewerSelecting([watchfaceURL])
+
+//                    self.showInFinderAndOpenInPhotos([imagePath, moviePath].map{URL(fileURLWithPath: $0)})
                 case .cancelled, .exporting, .failed, .unknown, .waiting:
                     fallthrough
                 @unknown default:
