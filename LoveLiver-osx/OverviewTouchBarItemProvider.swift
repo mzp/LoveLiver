@@ -20,19 +20,19 @@ protocol OverviewTouchBarItemProviderType : class {
     var dragging : Bool { get }
 
     @available(OSX 10.12.2, *)
-    func makeTouchbarItem(identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem
+    func makeTouchbarItem(identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem
 }
 
 @available(OSX 10.12.2, *)
 class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProviderType {
     var shouldUpdateScopeRange: ((_ newValue: CMTimeRange?) -> Bool)?
     var onScopeChange: ((_ overview : MovieOverviewControl) -> Void)?
-    var trimRange : CMTimeRange = kCMTimeRangeZero {
+    var trimRange : CMTimeRange = .zero {
         didSet {
             overview.trimRange = trimRange
         }
     }
-    var scopeRange : CMTimeRange = kCMTimeRangeZero {
+    var scopeRange : CMTimeRange = .zero {
         didSet {
             overview.scopeRange = scopeRange
         }
@@ -45,8 +45,8 @@ class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProvi
     init(player: AVPlayer, playerItem: AVPlayerItem) {
         self.overview = MovieOverviewControl(player: player, playerItem: playerItem)
         self.overview.draggingMode = .scope
-        self.overview.imageGeneratorTolerance = kCMTimeZero
-        super.init(nibName: nil, bundle: nil)!
+        self.overview.imageGeneratorTolerance = .zero
+        super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
@@ -54,7 +54,7 @@ class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProvi
     }
 
 
-    func makeTouchbarItem(identifier: NSTouchBarItemIdentifier) -> NSTouchBarItem {
+    func makeTouchbarItem(identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem {
         return NSCustomTouchBarItem(identifier: identifier) ※ { item in
             item.viewController = self
         }
@@ -96,7 +96,7 @@ class OverviewTouchBarItemProvider : NSViewController, OverviewTouchBarItemProvi
 
     private func seekToTouchPosition(_ touch: NSTouch) {
         let trimRange = overview.trimRange
-        let duration = overview.scopeRange?.duration ?? kCMTimeZero
+        let duration = overview.scopeRange?.duration ?? .zero
 
         let p = view.convert(touch.location(in: view), from: nil)
 

@@ -20,8 +20,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    @objc fileprivate func openDocument(_ sender: AnyObject?) {
-        NSDocumentController.shared().openDocument(sender)
+    @objc private func openDocument(_ sender: AnyObject?) {
+        NSDocumentController.shared.openDocument(sender)
     }
 }
 

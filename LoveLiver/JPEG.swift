@@ -28,11 +28,11 @@ class JPEG {
             else { return }
         defer { CGImageDestinationFinalize(dest) }
         guard let imageSource = self.imageSource() else { return }
-        guard let metadata = self.metadata()?.mutableCopy() as! NSMutableDictionary! else { return }
+        guard let metadata = self.metadata()?.mutableCopy() as? NSMutableDictionary else { return }
 
         let makerNote = NSMutableDictionary()
         makerNote.setObject(assetIdentifier, forKey: kFigAppleMakerNote_AssetIdentifier as NSCopying)
-        metadata.setObject(makerNote, forKey: kCGImagePropertyMakerAppleDictionary as String as String as NSCopying)
+        metadata.setObject(makerNote, forKey: kCGImagePropertyMakerAppleDictionary as String as NSCopying)
         let exifVersion = NSMutableDictionary()
         exifVersion.setObject([2,2,1], forKey: kCGImagePropertyExifVersion as String as NSCopying)
         metadata.setObject(exifVersion, forKey: kCGImagePropertyExifDictionary as String as NSCopying)

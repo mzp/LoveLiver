@@ -17,7 +17,7 @@ class MovieDocumentViewController: NSViewController {
     fileprivate let movieURL: URL
     fileprivate let player: AVPlayer
     fileprivate let playerItem: AVPlayerItem
-    var createLivePhotoAction: ((Void) -> Void)?
+    var createLivePhotoAction: (() -> Void)?
 
     fileprivate let playerView: AVPlayerView = AVPlayerView() ※ { v in
         v.controlsStyle = .floating

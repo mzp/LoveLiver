@@ -45,10 +45,10 @@ extension AVAssetImageGenerator {
 
 extension AVPlayerItem {
     var naturalSize: CGSize? {
-        return asset.tracks(withMediaType: AVMediaTypeVideo).first?.naturalSize
+        return asset.tracks(withMediaType: .video).first?.naturalSize
     }
 
     var minFrameDuration: CMTime? {
-        return asset.tracks(withMediaType: AVMediaTypeVideo).first?.minFrameDuration
+        return asset.tracks(withMediaType: .video).first?.minFrameDuration
     }
 }

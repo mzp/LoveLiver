@@ -1,20 +1,24 @@
 PODS:
-  - NorthLayout (3.0.0)
-  - "※ikemen (0.2.0)"
+  - FootlessParser (0.5.2)
+  - NorthLayout (5.2.0):
+    - FootlessParser (~> 0.4)
+  - "※ikemen (0.6.0)"
 
 DEPENDENCIES:
   - NorthLayout
   - "※ikemen"
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
+    - FootlessParser
     - NorthLayout
     - "※ikemen"
 
 SPEC CHECKSUMS:
-  NorthLayout: 28db8bfa49b861b4e972cc8e7c683c8ba819ff88
-  "※ikemen": c04aecee4293a2b6deb2119f7e67e7a82c6dea06
+  FootlessParser: 521916d592fa6cba06cfca6f4b5d4f5a2d49175a
+  NorthLayout: 308a58a8f7d96f316e6399ff6432f8769321bbdf
+  "※ikemen": da47fe6e0acfbe241611221f4d98ade266bf50a2
 
 PODFILE CHECKSUM: 8f7e2e0c449e19a45b4f4bb0d60e9a078496f69f
 
-COCOAPODS: 1.5.0
+COCOAPODS: 1.9.3
