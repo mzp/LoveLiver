@@ -312,23 +312,24 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
                     NSLog("%@", "LivePhoto MOV created: \(moviePath)")
 
                     let watchface = Watchface(
-                        metadata: .init(),
-                        face: .init(),
+                        metadata: .init(complication_sample_templates: .init(top: nil, bottom: nil), complications_names: .init(), complications_item_ids: .init()),
+                        face: .init(customization: .init(), complications: nil),
                         snapshot: Data(),
                         no_borders_snapshot: Data(),
                         device_border_snapshot: Data(),
                         resources: .init(
                             images: .init(imageList: [.init(
-                                topAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
-                                leftAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
-                                bottomAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
-                                rightAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
-                                imageURL: URL(fileURLWithPath: imagePath).lastPathComponent,
-                                irisVideoURL: URL(fileURLWithPath: moviePath).lastPathComponent,
-                                originalCropH: 480,
-                                originalCropW: 384,
-                                originalCropX: 0,
-                                originalCropY: 0)]),
+                            topAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
+                            leftAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
+                            bottomAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
+                            rightAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
+                            imageURL: assetIdentifier + ".jpg",
+                            irisVideoURL: assetIdentifier + ".mov",
+                            localIdentifier: assetIdentifier,
+                            originalCropH: 480,
+                            originalCropW: 384,
+                            originalCropX: 0,
+                            originalCropY: 0)]),
                             livePhotos: [(mov: QuickTimeMov(path: tmpMoviePath), jpeg: JPEG(path: tmpImagePath), assetIdentifier: assetIdentifier)]))
                     let tmpWatchfaceDataDir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(basename)-watchface-tmp")
                     let watchfaceURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(basename).watchface")
