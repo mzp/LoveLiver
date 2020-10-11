@@ -13,7 +13,7 @@ import NorthLayout
 
 class MovieOverviewControl: NSView {
     let player: AVPlayer
-    var playerTimeObserver: AnyObject?
+    var playerTimeObserver: Any?
     var currentTime: CMTime? {
         didSet { updateCurrentTime() }
     }
@@ -159,7 +159,7 @@ class MovieOverviewControl: NSView {
 
         playerTimeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 30), queue: DispatchQueue.main) { [weak self] time in
             self?.currentTime = time
-        } as AnyObject?
+        }
     }
 
     override func viewDidEndLiveResize() {

@@ -139,7 +139,7 @@ class QuickTimeMov {
         return asset.tracks(withMediaType: mediaType).first
     }
 
-    fileprivate func reader(_ track : AVAssetTrack, settings: [String:AnyObject]?) throws -> (AVAssetReader, AVAssetReaderOutput) {
+    fileprivate func reader(_ track : AVAssetTrack, settings: [String: Any]?) throws -> (AVAssetReader, AVAssetReaderOutput) {
         let output = AVAssetReaderTrackOutput(track: track, outputSettings: settings)
         let reader = try AVAssetReader(asset: asset)
         reader.add(output)
@@ -160,11 +160,11 @@ class QuickTimeMov {
         return AVAssetWriterInputMetadataAdaptor(assetWriterInput: input)
     }
 
-    fileprivate func videoSettings(_ size : CGSize) -> [String:AnyObject] {
+    fileprivate func videoSettings(_ size : CGSize) -> [String: Any] {
         return [
-            AVVideoCodecKey: AVVideoCodecH264 as AnyObject,
-            AVVideoWidthKey: size.width as AnyObject,
-            AVVideoHeightKey: size.height as AnyObject
+            AVVideoCodecKey: AVVideoCodecH264,
+            AVVideoWidthKey: size.width,
+            AVVideoHeightKey: size.height
         ]
     }
 
