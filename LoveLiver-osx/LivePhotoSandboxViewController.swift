@@ -11,9 +11,11 @@ import AVFoundation
 import AVKit
 import NorthLayout
 import Ikemen
+import Watchface
+import ZIPFoundation
 
 
-private let livePhotoDuration: TimeInterval = 3
+private let livePhotoDuration: TimeInterval = 2.3
 private let outputDir = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Pictures/LoveLiver")
 
 @available (OSX 10.12.2, *)
@@ -311,32 +313,45 @@ class LivePhotoSandboxViewController: NSViewController, NSTouchBarDelegate {
                     QuickTimeMov(path: tmpMoviePath).write(moviePath, assetIdentifier: assetIdentifier)
                     NSLog("%@", "LivePhoto MOV created: \(moviePath)")
 
-                    let watchface = Watchface(
-                        metadata: .init(complication_sample_templates: .init(top: nil, bottom: nil), complications_names: .init(), complications_item_ids: .init()),
-                        face: .init(customization: .init(), complications: nil),
+                    let photosWatchface = PhotosWatchface(
+                        device_size: 2,
+                        position: .bototm,
                         snapshot: Data(),
                         no_borders_snapshot: Data(),
-                        device_border_snapshot: Data(),
+                        topComplication: nil,
+                        bottomComplication: nil,
                         resources: .init(
-                            images: .init(imageList: [.init(
-                            topAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
-                            leftAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
-                            bottomAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
-                            rightAnalysis: .init(bgBrightness: 0.4274589419364929, bgHue: 0.4999990463256836, bgSaturation: 0.6849286556243896, coloredText: false, complexBackground: true, shadowBrightness: 0.7594004273414612, shadowHue: 0.4999992251396179, shadowSaturation: 0.4989655613899231, textBrightness: 0.5038251876831055, textHue: 0.4999990463256836, textSaturation: 0.6053272485733032),
-                            imageURL: assetIdentifier + ".jpg",
-                            irisVideoURL: assetIdentifier + ".mov",
-                            localIdentifier: assetIdentifier,
-                            originalCropH: 480,
-                            originalCropW: 384,
-                            originalCropX: 0,
-                            originalCropY: 0)]),
-                            livePhotos: [(mov: QuickTimeMov(path: tmpMoviePath), jpeg: JPEG(path: tmpImagePath), assetIdentifier: assetIdentifier)]))
+                            images: .init(imageList: [
+                                .init(topAnalysis: .init(bgBrightness: 0, bgHue: 0, bgSaturation: 0, coloredText: false, complexBackground: false, shadowBrightness: 0, shadowHue: 0, shadowSaturation: 0, textBrightness: 0, textHue: 0, textSaturation: 0),
+                                      leftAnalysis: .init(bgBrightness: 0, bgHue: 0, bgSaturation: 0, coloredText: false, complexBackground: false, shadowBrightness: 0, shadowHue: 0, shadowSaturation: 0, textBrightness: 0, textHue: 0, textSaturation: 0),
+                                      bottomAnalysis: .init(bgBrightness: 0, bgHue: 0, bgSaturation: 0, coloredText: false, complexBackground: false, shadowBrightness: 0, shadowHue: 0, shadowSaturation: 0, textBrightness: 0, textHue: 0, textSaturation: 0),
+                                      rightAnalysis: .init(bgBrightness: 0, bgHue: 0, bgSaturation: 0, coloredText: false, complexBackground: false, shadowBrightness: 0, shadowHue: 0, shadowSaturation: 0, textBrightness: 0, textHue: 0, textSaturation: 0),
+                                      imageURL: assetIdentifier + ".jpg",
+                                      irisDuration: 2.3,
+                                      irisStillDisplayTime: 1.4,
+                                      irisVideoURL: assetIdentifier + ".mov",
+                                      isIris: true,
+                                      localIdentifier: assetIdentifier,
+                                      originalCropH: 480,
+                                      originalCropW: 384,
+                                      originalCropX: 0,
+                                      originalCropY: 0)
+                            ]),
+                            files: [
+                                assetIdentifier + ".jpg": try! Data(contentsOf: URL(fileURLWithPath: imagePath)),
+                                assetIdentifier + ".mov": try! Data(contentsOf: URL(fileURLWithPath: moviePath))
+                            ]))
+                    let watchface = Watchface(photosWatchface: photosWatchface)
                     let tmpWatchfaceDataDir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(basename)-watchface-tmp")
+                    let watchfaceContentURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(basename)-watchface-content")
                     let watchfaceURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(basename).watchface")
                     try! FileManager.default.createDirectory(atPath: tmpWatchfaceDataDir.path, withIntermediateDirectories: true, attributes: nil)
-                    try! watchface.fileWrapper(tmpDir: tmpWatchfaceDataDir).write(to: watchfaceURL, options: .atomic, originalContentsURL: nil)
+                    try! FileWrapper(watchface: watchface).write(to: watchfaceContentURL, options: .atomic, originalContentsURL: nil)
                     try! FileManager.default.removeItem(at: tmpWatchfaceDataDir)
-                    NSWorkspace.shared.activateFileViewerSelecting([watchfaceURL])
+                    try! FileManager.default.zipItem(at: watchfaceContentURL, to: watchfaceURL, shouldKeepParent: false)
+
+                    NSWorkspace.shared.activateFileViewerSelecting([watchfaceContentURL])
+                    NSSharingService(named: .sendViaAirDrop)?.perform(withItems: [watchfaceURL])
 
 //                    self.showInFinderAndOpenInPhotos([imagePath, moviePath].map{URL(fileURLWithPath: $0)})
                 case .cancelled, .exporting, .failed, .unknown, .waiting:

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		13277FE71DFCD183001AED4B /* OverviewTouchBarItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13277FE61DFCD183001AED4B /* OverviewTouchBarItemProvider.swift */; };
 		C2C41F0CC51A39D97981D73D /* Pods_LoveLiver_osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */; };
-		EA2541A124B36E1100B44B19 /* Watchface.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2541A024B36E1100B44B19 /* Watchface.swift */; };
 		EA27F5EF1C98426A00C23F40 /* MovieOverviewControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */; };
 		EA379AB91C68DE6D00106AEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA379AB81C68DE6D00106AEF /* AppDelegate.swift */; };
 		EA379ABB1C68DE6D00106AEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EA379ABA1C68DE6D00106AEF /* Assets.xcassets */; };
@@ -30,7 +29,6 @@
 		3B34746BF27B18F34F5E26C5 /* Pods_LoveLiver_osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LoveLiver_osx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4F0CA317E59A557EE5DD45B6 /* Pods-LoveLiver-osx.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoveLiver-osx.release.xcconfig"; path = "Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx.release.xcconfig"; sourceTree = "<group>"; };
 		DCD5B633553004CEA3DAF5F6 /* Pods-LoveLiver-osx.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoveLiver-osx.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx.debug.xcconfig"; sourceTree = "<group>"; };
-		EA2541A024B36E1100B44B19 /* Watchface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Watchface.swift; sourceTree = "<group>"; };
 		EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieOverviewControl.swift; sourceTree = "<group>"; };
 		EA379AB61C68DE6D00106AEF /* LoveLiver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoveLiver.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA379AB81C68DE6D00106AEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -112,7 +110,6 @@
 				EA27F5EE1C98426A00C23F40 /* MovieOverviewControl.swift */,
 				13277FE61DFCD183001AED4B /* OverviewTouchBarItemProvider.swift */,
 				EA6D28861C9EF0FD00F06E79 /* AVKitExtension.swift */,
-				EA2541A024B36E1100B44B19 /* Watchface.swift */,
 				EA379ABA1C68DE6D00106AEF /* Assets.xcassets */,
 				EA379ABC1C68DE6D00106AEF /* MainMenu.xib */,
 				EA379ABF1C68DE6D00106AEF /* Info.plist */,
@@ -217,12 +214,16 @@
 				"${PODS_ROOT}/Target Support Files/Pods-LoveLiver-osx/Pods-LoveLiver-osx-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/FootlessParser/FootlessParser.framework",
 				"${BUILT_PRODUCTS_DIR}/NorthLayout/NorthLayout.framework",
+				"${BUILT_PRODUCTS_DIR}/Watchface/Watchface.framework",
+				"${BUILT_PRODUCTS_DIR}/ZIPFoundation/ZIPFoundation.framework",
 				"${BUILT_PRODUCTS_DIR}/※ikemen/Ikemen.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FootlessParser.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NorthLayout.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Watchface.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ZIPFoundation.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Ikemen.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -242,7 +243,6 @@
 				EA379ADF1C6A33A700106AEF /* QuickTimeMov.swift in Sources */,
 				EA379ADA1C6A283500106AEF /* MovieDocument.swift in Sources */,
 				EA6D28871C9EF0FD00F06E79 /* AVKitExtension.swift in Sources */,
-				EA2541A124B36E1100B44B19 /* Watchface.swift in Sources */,
 				EA27F5EF1C98426A00C23F40 /* MovieOverviewControl.swift in Sources */,
 				EA379ADD1C6A2E8800106AEF /* MovieDocumentViewController.swift in Sources */,
 				EA88135F1C9ED065000CE151 /* MovieOverviewViewController.swift in Sources */,

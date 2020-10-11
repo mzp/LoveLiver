@@ -2,23 +2,39 @@ PODS:
   - FootlessParser (0.5.2)
   - NorthLayout (5.2.0):
     - FootlessParser (~> 0.4)
+  - Watchface (0.0.1)
+  - ZIPFoundation (0.9.11)
   - "※ikemen (0.6.0)"
 
 DEPENDENCIES:
   - NorthLayout
+  - Watchface (from `https://github.com/banjun/WatchfaceDumper.git`)
+  - ZIPFoundation
   - "※ikemen"
 
 SPEC REPOS:
   trunk:
     - FootlessParser
     - NorthLayout
+    - ZIPFoundation
     - "※ikemen"
+
+EXTERNAL SOURCES:
+  Watchface:
+    :git: https://github.com/banjun/WatchfaceDumper.git
+
+CHECKOUT OPTIONS:
+  Watchface:
+    :commit: 9b872020b5b9e26e69cde9fb178eb1e78527cebe
+    :git: https://github.com/banjun/WatchfaceDumper.git
 
 SPEC CHECKSUMS:
   FootlessParser: 521916d592fa6cba06cfca6f4b5d4f5a2d49175a
   NorthLayout: 308a58a8f7d96f316e6399ff6432f8769321bbdf
+  Watchface: 9a62cdae5521104f0662d54db71d4e54baca4013
+  ZIPFoundation: b1f0de4eed33e74a676f76e12559ab6b75990197
   "※ikemen": da47fe6e0acfbe241611221f4d98ade266bf50a2
 
-PODFILE CHECKSUM: 8f7e2e0c449e19a45b4f4bb0d60e9a078496f69f
+PODFILE CHECKSUM: a802f67eae2267ab48962bbda5d94acc52870842
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0.beta.1

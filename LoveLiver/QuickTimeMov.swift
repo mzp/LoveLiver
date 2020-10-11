@@ -160,11 +160,12 @@ class QuickTimeMov {
         return AVAssetWriterInputMetadataAdaptor(assetWriterInput: input)
     }
 
-    fileprivate func videoSettings(_ size : CGSize) -> [String:AnyObject] {
+    fileprivate func videoSettings(_ size : CGSize) -> [String:Any] {
+        let ratio = min(1, max(320 / size.width, 400 / size.height))
         return [
-            AVVideoCodecKey: AVVideoCodecH264 as AnyObject,
-            AVVideoWidthKey: size.width as AnyObject,
-            AVVideoHeightKey: size.height as AnyObject
+            AVVideoCodecKey: AVVideoCodecH264,
+            AVVideoWidthKey: size.width * ratio,
+            AVVideoHeightKey: size.height * ratio,
         ]
     }
 
